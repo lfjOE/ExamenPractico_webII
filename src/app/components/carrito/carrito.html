@@ -1,0 +1,76 @@
+<!-- carrito.html -->
+<div class="carrito-container">
+  <h2>MaterialHub</h2>
+  
+  <!-- Sección de Productos Disponibles -->
+  <div class="productos-disponibles">
+    <h3>📦 Productos Disponibles</h3>
+    <div class="grid-productos">
+      <div *ngFor="let producto of productosDisponibles" 
+           class="producto-card" 
+           (click)="agregarProducto(producto)">
+        <div class="producto-imagen">{{ producto.imagen }}</div>
+        <div class="producto-info">
+          <h4>{{ producto.nombre }}</h4>
+          <p class="descripcion">{{ producto.descripcion }}</p>
+          <p class="precio">${{ producto.precio }}</p>
+        </div>
+        <button class="btn-agregar">+ Agregar</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Sección del Carrito -->
+  <div class="carrito-section">
+    <h3>🛒 Tu Carrito ({{ carritoService.productos().length }})</h3>
+    
+    <div *ngIf="carritoService.productos().length === 0" class="carrito-vacio">
+      <p>Tu carrito está vacío. ¡Haz clic en algún producto para agregarlo!</p>
+    </div>
+
+    <div *ngIf="carritoService.productos().length > 0">
+      <div class="productos-lista">
+        <div *ngFor="let producto of carritoService.productos()" class="producto-item">
+          <div class="producto-info">
+            <span class="producto-emoji">{{ producto.imagen }}</span>
+            <div>
+              <h4>{{ producto.nombre }}</h4>
+              <p class="descripcion">{{ producto.descripcion }}</p>
+            </div>
+          </div>
+          <div class="producto-actions">
+            <span class="precio">${{ producto.precio }}</span>
+            <button (click)="quitar(producto.id); $event.stopPropagation()" 
+                    class="btn-quitar">
+              ❌
+            </button>
+          </div>
+        </div>
+      </div>
+
+      <div class="totales">
+        <div class="total-line">
+          <span>Subtotal:</span>
+          <span>${{ carritoService.subtotal().toFixed(2) }}</span>
+        </div>
+        <div class="total-line">
+          <span>IVA (16%):</span>
+          <span>${{ carritoService.iva().toFixed(2) }}</span>
+        </div>
+        <div class="total-line total-final">
+          <span>Total:</span>
+          <span>${{ carritoService.total().toFixed(2) }}</span>
+        </div>
+      </div>
+
+      <div class="acciones">
+        <button (click)="vaciar()" class="btn-vaciar">
+          🗑️ Vaciar Carrito
+        </button>
+        <button (click)="procederCompra()" class="btn-comprar">
+          💳 Proceder con la Compra
+        </button>
+      </div>
+    </div>
+  </div>
+</div>
