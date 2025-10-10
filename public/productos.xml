@@ -1,0 +1,142 @@
+<productos>
+    <producto>
+        <id>1</id>
+        <nombre>Martillo de Carpintero</nombre>
+        <precio>180</precio>
+        <descripcion>Martillo profesional de acero forjado</descripcion>
+        <imagen>🔨</imagen>
+    </producto>
+    <producto>
+        <id>2</id>
+        <nombre>Taladro Percutor</nombre>
+        <precio>650</precio>
+        <descripcion>Taladro inalámbrico 20V con 2 baterías</descripcion>
+        <imagen>🪛</imagen>
+    </producto>
+    <producto>
+        <id>3</id>
+        <nombre>Sierra Circular</nombre>
+        <precio>890</precio>
+        <descripcion>Sierra circular 1800W con láser guía</descripcion>
+        <imagen>⚙️</imagen>
+    </producto>
+    <producto>
+        <id>4</id>
+        <nombre>Cemento Gris</nombre>
+        <precio>120</precio>
+        <descripcion>Bulto de cemento 50kg tipo Portland</descripcion>
+        <imagen>🏗️</imagen>
+    </producto>
+    <producto>
+        <id>5</id>
+        <nombre>Arena para Construcción</nombre>
+        <precio>85</precio>
+        <descripcion>M³ de arena lavada para mezcla</descripcion>
+        <imagen>🏖️</imagen>
+    </producto>
+    <producto>
+        <id>6</id>
+        <nombre>Grava Triturada</nombre>
+        <precio>95</precio>
+        <descripcion>M³ de grava 3/4" para concreto</descripcion>
+        <imagen>🪨</imagen>
+    </producto>
+    <producto>
+        <id>7</id>
+        <nombre>Ladrillos</nombre>
+        <precio>450</precio>
+        <descripcion>Millar de ladrillos estándar 6 huecos</descripcion>
+        <imagen>🧱</imagen>
+    </producto>
+    <producto>
+        <id>8</id>
+        <nombre>Bloques de Concreto</nombre>
+        <precio>380</precio>
+        <descripcion>Millar de bloques 15x20x40 cm</descripcion>
+        <imagen>📦</imagen>
+    </producto>
+    <producto>
+        <id>9</id>
+        <nombre>Varilla Corrugada</nombre>
+        <precio>220</precio>
+        <descripcion>Varilla 1/2" x 12m grado 42</descripcion>
+        <imagen>📏</imagen>
+    </producto>
+    <producto>
+        <id>10</id>
+        <nombre>Alambre de Amarre</nombre>
+        <precio>45</precio>
+        <descripcion>Rollo alambre negro calibre 16</descripcion>
+        <imagen>🧵</imagen>
+    </producto>
+    <producto>
+        <id>11</id>
+        <nombre>Pintura Vinílica</nombre>
+        <precio>280</precio>
+        <descripcion>Galón de pintura base agua para interior</descripcion>
+        <imagen>🎨</imagen>
+    </producto>
+    <producto>
+        <id>12</id>
+        <nombre>Brochas Profesionales</nombre>
+        <precio>35</precio>
+        <descripcion>Set 3 brochas de cerdas naturales</descripcion>
+        <imagen>🖌️</imagen>
+    </producto>
+    <producto>
+        <id>13</id>
+        <nombre>Escalera de Aluminio</nombre>
+        <precio>1250</precio>
+        <descripcion>Escalera extensible 5.5 metros</descripcion>
+        <imagen>🪜</imagen>
+    </producto>
+    <producto>
+        <id>14</id>
+        <nombre>Andamio Metálico</nombre>
+        <precio>3200</precio>
+        <descripcion>Juego de andamio para 4 metros de altura</descripcion>
+        <imagen>🏗️</imagen>
+    </producto>
+    <producto>
+        <id>15</id>
+        <nombre>Carretilla de Obra</nombre>
+        <precio>580</precio>
+        <descripcion>Carretilla metálica capacidad 100L</descripcion>
+        <imagen>🚜</imagen>
+    </producto>
+    <producto>
+        <id>16</id>
+        <nombre>Mezcladora de Concreto</nombre>
+        <precio>4200</precio>
+        <descripcion>Mezcladora eléctrica 1.5 HP 130L</descripcion>
+        <imagen>🌀</imagen>
+    </producto>
+    <producto>
+        <id>17</id>
+        <nombre>Nivel Láser</nombre>
+        <precio>850</precio>
+        <descripcion>Nivel láser automático 360 grados</descripcion>
+        <imagen>📐</imagen>
+    </producto>
+    <producto>
+        <id>18</id>
+        <nombre>Cinta Métrica</nombre>
+        <precio>25</precio>
+        <descripcion>Cinta métrica 8m con freno automático</descripcion>
+        <imagen>📏</imagen>
+    </producto>
+    <producto>
+        <id>19</id>
+        <nombre>Chaleco de Seguridad</nombre>
+        <precio>45</precio>
+        <descripcion>Chaleco reflectivo talla M</descripcion>
+        <imagen>🦺</imagen>
+    </producto>
+    <producto>
+        <id>20</id>
+        <nombre>Casco de Obra</nombre>
+        <precio>65</precio>
+        <descripcion>Casco de seguridad con ajuste trasero</descripcion>
+        <imagen>⛑️</imagen>
+    </producto>
+</productos>
