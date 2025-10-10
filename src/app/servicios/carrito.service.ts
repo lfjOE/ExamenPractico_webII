@@ -17,28 +17,19 @@ export class CarritoService {
     productos = signal<Producto[]>([]);
 
     async cargarProductosDesdeXML(): Promise<Producto[]> {
-        const response = await fetch('productos.xml');
-        const xmlText = await response.text();
-        const parser = new DOMParser();
-        const xmlDoc = parser.parseFromString(xmlText, 'application/xml');
-        const productosXML = Array.from(xmlDoc.getElementsByTagName('producto'));
-        const productos = productosXML.map(prod => ({
-        id: Number(prod.getElementsByTagName('id')[0].textContent),
-        nombre: prod.getElementsByTagName('nombre')[0].textContent || '',
-        precio: Number(prod.getElementsByTagName('precio')[0].textContent),
-        descripcion: prod.getElementsByTagName('descripcion')[0].textContent || '',
-        imagen: prod.getElementsByTagName('imagen')[0]?.textContent || ''
-            }));
-        console.log('Productos cargados:', productos);
-        return productos;
+        const response = await fetch('/api/catalogo/productos');
+        if (!response.ok) throw new Error('HTTP ' + response.status);
+        const productos = await response.json();
+        return productos as Producto[];
     }
+
 
     agregar(producto: Producto) {
         this.productos.update(products => [...products, producto]);
     }
 
     quitar(id: number) {
-        this.productos.update(products => products.filter(p => p.id !== id));
+        this.productos.update(products => products.filter(p => p.id_producto !== id));
     }
 
     vaciar() {
@@ -80,7 +71,7 @@ export class CarritoService {
   <productos>
     ${recibo.productos.map(producto => `
     <producto>
-      <id>${producto.id}</id>
+      <id>${producto.id_producto}</id>
       <nombre>${this.escapeXML(producto.nombre)}</nombre>
       <precio>${producto.precio}</precio>
       <descripcion>${this.escapeXML(producto.descripcion)}</descripcion>
