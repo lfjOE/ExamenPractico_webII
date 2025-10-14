@@ -17,10 +17,10 @@ export class CarritoComponent {
 
   constructor() {
     this.cargarProductos();
-  }
+  } 
 
   async cargarProductos() {
-    this.productosDisponibles = await this.carritoService.cargarProductosDesdeXML();
+    this.productosDisponibles = await this.carritoService.cargarProductosDesdeBD();
   }
 
   quitar(id: number) {

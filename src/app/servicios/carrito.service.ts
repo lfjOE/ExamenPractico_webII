@@ -16,7 +16,7 @@ export interface Recibo {
 export class CarritoService {
     productos = signal<Producto[]>([]);
 
-    async cargarProductosDesdeXML(): Promise<Producto[]> {
+    async cargarProductosDesdeBD(): Promise<Producto[]> {
         const response = await fetch('/api/catalogo/productos');
         if (!response.ok) throw new Error('HTTP ' + response.status);
         const productos = await response.json();
