@@ -17,8 +17,9 @@ export class CarritoService {
     productos = signal<Producto[]>([]);
 
     async cargarProductosDesdeBD(): Promise<Producto[]> {
-        const response = await fetch('/api/catalogo/productos');
+        const response = await fetch('http://localhost:4000/api/catalogo/productos');
         if (!response.ok) throw new Error('HTTP ' + response.status);
+        console.log(response);
         const productos = await response.json();
         return productos as Producto[];
     }

@@ -6,6 +6,7 @@ export const obtenerProductos = (req, res) => {
     if (err) {
       return res.status(500).json({ error: 'Error al obtener los productos' });
     }
+    console.log(results);
     res.json(results);
   });
 };

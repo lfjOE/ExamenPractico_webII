@@ -2,11 +2,13 @@ import { Component, inject } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { CarritoService } from '../../servicios/carrito.service';
 import { Producto } from '../../models/producto';
+import { NgxPayPalModule } from "ngx-paypal";
+import { Paypal } from '../paypal/paypal';
 
 @Component({
   selector: 'app-carrito',
   standalone: true,
-  imports: [CommonModule],
+  imports: [CommonModule, NgxPayPalModule, Paypal],
   templateUrl: './carrito.html',
   styleUrl: './carrito.css'
 })
@@ -17,7 +19,7 @@ export class CarritoComponent {
 
   constructor() {
     this.cargarProductos();
-  } 
+  }
 
   async cargarProductos() {
     this.productosDisponibles = await this.carritoService.cargarProductosDesdeBD();
