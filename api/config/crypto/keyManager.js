@@ -1,13 +1,8 @@
 import fs from 'fs';
 import path from 'path';
 import { fileURLToPath } from 'url';
-import {
-  generateKeyPairSync,
-  randomBytes,
-  privateEncrypt,
-  publicDecrypt,
-  constants
-} from 'crypto';
+import { spawnSync } from 'child_process';
+import { createHash, scryptSync } from 'crypto';
 import dotenv from 'dotenv';
 dotenv.config();
 
@@ -18,10 +13,7 @@ const KEYS_DIR = process.env.CRYPTO_DIR
   ? path.resolve(process.env.CRYPTO_DIR)
   : path.join(__dirname, 'keys');
 
-  // Rutas de los archivos de llaves y de la AES envuelta
-const PUB_PATH = path.join(KEYS_DIR, 'public.pem');
-const PRIV_PATH = path.join(KEYS_DIR, 'private.pem');
-const SYM_ENC_PATH = path.join(KEYS_DIR, 'symkey.enc');
+const P12_PATH = path.join(KEYS_DIR, 'keystore.p12');
 
 let _symKeyCache = null;
 
@@ -29,75 +21,77 @@ function ensureDir(p) {
   if (!fs.existsSync(p)) fs.mkdirSync(p, { recursive: true });
 }
 
-// Se llama al iniciar el servidor. Si faltan llaves o symkey.enc, los genera.
-export function ensureKeysOnBoot() {
-  ensureDir(KEYS_DIR);
-
-  const hasAll =
-    fs.existsSync(PUB_PATH) &&
-    fs.existsSync(PRIV_PATH) &&
-    fs.existsSync(SYM_ENC_PATH);
-
-  if (hasAll) return;
-
+function requirePassphrase() {
   const passphrase = process.env.PRIVATE_KEY_PASSPHRASE || '';
   if (!passphrase) {
-    throw new Error('Falta PRIVATE_KEY_PASSPHRASE en .env para encriptar la llave privada');
+    throw new Error('Falta PRIVATE_KEY_PASSPHRASE en .env para proteger el PKCS#12');
   }
-
-  //Genera par de llaves RSA-4096
-  const { publicKey, privateKey } = generateKeyPairSync('rsa', {
-    modulusLength: 4096,
-    publicKeyEncoding: { type: 'pkcs1', format: 'pem' },
-    privateKeyEncoding: {
-      type: 'pkcs8',
-      format: 'pem',
-      cipher: 'aes-256-cbc',
-      passphrase
-    }
-  });
-
-  fs.writeFileSync(PUB_PATH, publicKey, { mode: 0o600 });
-  fs.writeFileSync(PRIV_PATH, privateKey, { mode: 0o600 });
-
-  //Genera la llave simétrica AES-256 (32 bytes aleatorios)
-  const aesKey = randomBytes(32);
-
-  //Envuelve la AES usando la LLAVE PRIVADA
-  const symEnc = privateEncrypt(
-    {
-      key: privateKey,
-      passphrase,
-      padding: constants.RSA_PKCS1_PADDING
-    },
-    aesKey
-  );
-  fs.writeFileSync(SYM_ENC_PATH, symEnc.toString('base64'), { mode: 0o600 });
+  return passphrase;
 }
 
-// Devuelve el PEM de la llave pública
-export function getPublicKeyPem() {
-  return fs.readFileSync(PUB_PATH, 'utf8');
+function run(cmd, args, opts = {}) {
+  const r = spawnSync(cmd, args, { stdio: 'pipe', ...opts });
+  if (r.status !== 0) {
+    const out = (r.stdout || '').toString();
+    const err = (r.stderr || '').toString();
+    throw new Error(`Error al ejecutar "${cmd} ${args.join(' ')}":\n${out}\n${err}`);
+  }
+  return r;
 }
 
-// Obtiene la AES-256
+export function ensureKeysOnBoot() {
+  ensureDir(KEYS_DIR);
+  if (fs.existsSync(P12_PATH)) return;
+
+  const passphrase = requirePassphrase();
+
+  const TMP_PRIV = path.join(KEYS_DIR, '.tmp_priv.pem');
+  const TMP_CERT = path.join(KEYS_DIR, '.tmp_cert.pem');
+
+  try {
+
+    run('openssl', ['genrsa', '-out', TMP_PRIV, '4096']);
+
+    run('openssl', [
+      'req', '-new', '-x509',
+      '-key', TMP_PRIV,
+      '-subj', '/CN=MaterialHub/',
+      '-days', '3650',
+      '-out', TMP_CERT
+    ]);
+
+    run('openssl', [
+      'pkcs12', '-export',
+      '-inkey', TMP_PRIV,
+      '-in', TMP_CERT,
+      '-out', P12_PATH,
+      '-name', 'materialhub',
+      '-passout', `pass:${passphrase}`
+    ]);
+
+    //Asegurar permisos estrictos
+    fs.chmodSync(P12_PATH, 0o600);
+  } finally {
+    //Limpiar temporales
+    try { fs.unlinkSync(TMP_PRIV); } catch {}
+    try { fs.unlinkSync(TMP_CERT); } catch {}
+  }
+}
+
 export function getSymKey() {
   if (_symKeyCache) return _symKeyCache;
 
-  const publicPem = getPublicKeyPem();
-  const encB64 = fs.readFileSync(SYM_ENC_PATH, 'utf8').trim();
-  const encBuf = Buffer.from(encB64, 'base64');
-
-  const aesKey = publicDecrypt(
-    {
-      key: publicPem,
-      padding: constants.RSA_PKCS1_PADDING
-    },
-    encBuf
-  );
-  if (aesKey.length !== 32) {
-    throw new Error('La llave simétrica no es de 32 bytes (AES-256)');
+  const passphrase = requirePassphrase();
+  if (!fs.existsSync(P12_PATH)) {
+    throw new Error('PKCS#12 no existe. Llama ensureKeysOnBoot() temprano.');
   }
-  _symKeyCache = aesKey;
+  const p12Bytes = fs.readFileSync(P12_PATH);
+  const salt = createHash('sha256').update(p12Bytes).digest();
+
+  _symKeyCache = scryptSync(passphrase, salt, 32);
   return _symKeyCache;
+}
+
+export function getPkcs12Path() {
+  return P12_PATH;
 }

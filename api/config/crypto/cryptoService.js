@@ -1,13 +1,14 @@
+// config/crypto/cryptoService.js
 import { randomBytes, createCipheriv, createDecipheriv } from 'crypto';
 import { getSymKey } from './keyManager.js';
 
 export function encryptPassword(plaintext) {
-  const key = getSymKey();
-  const iv = randomBytes(12);
+  const key = getSymKey();              // AES-256 derivada en memoria
+  const iv = randomBytes(12);           // GCM nonce de 96 bits
   const cipher = createCipheriv('aes-256-gcm', key, iv);
   const ct = Buffer.concat([cipher.update(String(plaintext), 'utf8'), cipher.final()]);
   const tag = cipher.getAuthTag();
-  const out = Buffer.concat([iv, ct, tag]).toString('base64');
+  const out = Buffer.concat([iv, ct, tag]).toString('base64'); // [IV||CT||TAG]
   return out;
 }
 
