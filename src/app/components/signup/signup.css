@@ -1,0 +1,36 @@
+.signup-wrap {
+  max-width: 420px;
+  margin: 24px auto;
+  padding: 20px;
+  border: 1px solid #eee;
+  border-radius: 12px;
+  background: #fff;
+}
+.signup-wrap h2 {
+  margin: 0 0 16px;
+}
+.form {
+  display: grid;
+  gap: 10px;
+}
+.form label {
+  font-weight: 600;
+}
+.form input {
+  padding: 10px;
+  border: 1px solid #ddd;
+  border-radius: 8px;
+}
+.form button {
+  margin-top: 8px;
+  padding: 10px 14px;
+  border: 0;
+  border-radius: 8px;
+  background: #e98f3b;
+  color: #000;
+  font-weight: 700;
+  cursor: pointer;
+}
+.msg {
+  margin-top: 12px;
+}

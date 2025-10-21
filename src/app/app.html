@@ -1,9 +1,17 @@
-<header style="background: #e98f3b; color: rgb(0, 0, 0); padding: 20px; text-align: center; margin-bottom: 20px; font-family: 'Arial', sans-serif; font-size:x-large;">
-  <h1>MaterialHub 🛠️</h1>
+<header style="background:#e98f3b;color:#000;padding:14px 16px;display:flex;align-items:center;justify-content:space-between;font-family:Arial,sans-serif">
+  <h1 style="margin:0">MaterialHub 🛠️</h1>
+  <div>
+    <button *ngIf="view==='catalogo'" (click)="goSignup()" style="padding:8px 12px;border:0;border-radius:8px;background:#000;color:#fff;cursor:pointer;margin-right:8px">Crear cuenta</button>
+    <button *ngIf="view==='catalogo'" (click)="goLogin()" style="padding:8px 12px;border:0;border-radius:8px;background:#000;color:#fff;cursor:pointer">Iniciar sesión</button>
+
+    <button *ngIf="view!=='catalogo'" (click)="goCatalogo()" style="padding:8px 12px;border:0;border-radius:8px;background:#000;color:#fff;cursor:pointer">Volver al catálogo</button>
+  </div>
 </header>
 
 <main>
-  <app-carrito></app-carrito>
+  <app-carrito *ngIf="view==='catalogo'"></app-carrito>
+  <app-signup *ngIf="view==='signup'"></app-signup>
+  <app-login *ngIf="view==='login'"></app-login>
 </main>
 
-<router-outlet />
+<router-outlet></router-outlet>

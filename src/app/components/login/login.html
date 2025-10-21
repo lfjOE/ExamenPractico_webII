@@ -1,0 +1,21 @@
+<div class="login-wrap">
+  <h2>Iniciar sesión</h2>
+
+  <form (ngSubmit)="ingresar()" #f="ngForm" class="form">
+    <label>Usuario o correo</label>
+    <input name="usernameOrEmail" [(ngModel)]="model.usernameOrEmail" required />
+
+    <label>Contraseña</label>
+    <input type="password" name="password" [(ngModel)]="model.password" required />
+
+    <button type="submit" [disabled]="loading || !f.valid">
+      {{ loading ? 'Ingresando…' : 'Ingresar' }}
+    </button>
+  </form>
+
+  <p class="msg" *ngIf="message">{{ message }}</p>
+
+  <div class="ok" *ngIf="user?.ok">
+    <div>Bienvenido: {{ user.username }} ({{ user.email }})</div>
+  </div>
+</div>

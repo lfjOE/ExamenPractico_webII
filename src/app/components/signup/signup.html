@@ -1,0 +1,26 @@
+<div class="signup-wrap">
+  <h2>Crear cuenta</h2>
+
+  <form (ngSubmit)="registrar()" #f="ngForm" class="form">
+    <label>Usuario</label>
+    <input name="username" [(ngModel)]="model.username" required />
+
+    <label>Correo</label>
+    <input type="email" name="email" [(ngModel)]="model.email" required />
+
+    <label>Apellido</label>
+    <input name="lastname" [(ngModel)]="model.lastname" />
+
+    <label>Contraseña</label>
+    <input type="password" name="password" [(ngModel)]="model.password" required />
+
+    <label>Fecha de nacimiento</label>
+    <input type="date" name="birthdate" [(ngModel)]="model.birthdate" />
+
+    <button type="submit" [disabled]="loading || !f.valid">
+      {{ loading ? 'Creando…' : 'Crear cuenta' }}
+    </button>
+  </form>
+
+  <p class="msg" *ngIf="message">{{ message }}</p>
+</div>
