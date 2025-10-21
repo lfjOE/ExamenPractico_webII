@@ -62,7 +62,7 @@ export class Paypal implements OnInit {
     this.payPalConfig = {
       currency: 'USD',
       clientId: 'AUefwwBarLq7iQFmiLlkjvEqSVC--rPRYRodTNGKDJThZVVUllOynPI9JfbJ5EZxSZsB39Gf2vfvDlsz',
-      createOrderOnClient: (data) => <ICreateOrderRequest>{
+      createOrderOnClient: (data:any) => <ICreateOrderRequest>{
         intent: 'CAPTURE',
         purchase_units: [
           {
@@ -87,23 +87,23 @@ export class Paypal implements OnInit {
         label: 'paypal',
         layout: 'vertical'
       },
-      onApprove: (data, actions) => {
+      onApprove: (data:any, actions:any) => {
         console.log('onApprove - transaction was approved, but not authorized', data, actions);
         actions.order.get().then((details: any) => {
           console.log('onApprove - you can get full order details inside onApprove: ', details);
         });
       },
-      onClientAuthorization: (data) => {
+      onClientAuthorization: (data:any) => {
         console.log('onClientAuthorization - you should probably inform your server about completed transaction at this point', data);
         this.pagoAutorizado.emit();
       },
-      onCancel: (data, actions) => {
+      onCancel: (data:any, actions:any) => {
         console.log('OnCancel', data, actions);
       },
-      onError: err => {
+      onError: (err: any) => {
         console.log('OnError', err);
       },
-      onClick: (data, actions) => {
+      onClick: (data:any, actions:any) => {
         console.log('onClick', data, actions);
       },
     };
