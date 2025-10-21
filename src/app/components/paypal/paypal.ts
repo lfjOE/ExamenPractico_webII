@@ -12,7 +12,16 @@ export class Paypal implements OnInit {
   public payPalConfig?: IPayPalConfig;
 
   @Output() pagoAutorizado = new EventEmitter<void>();
-  @Input() productos: Producto[] = [];
+  private _productos: Producto[] = [];
+
+  @Input()
+  set productos(value: Producto[]) {
+    this._productos = value || [];
+    this.initConfig();
+  }
+  get productos(): Producto[] {
+    return this._productos;
+  }
 
   ngOnInit(): void {
     this.initConfig();
@@ -27,15 +36,14 @@ export class Paypal implements OnInit {
   }
 
   private calcularTotal(): number {
-    return this.calcularSubtotal() + this.calcularIVA();
+    return this.calcularSubtotal();
   }
 
   private initConfig(): void {
+    console.log("Los productos para PayPal son:", this.productos);
     const subtotal = this.calcularSubtotal();
-    const iva = this.calcularIVA();
-    const total = this.calcularTotal();
+    const total = subtotal;
 
-    // Convertir productos a items de PayPal
     const items = this.productos.map(producto => ({
       name: producto.nombre,
       quantity: '1',
@@ -46,18 +54,6 @@ export class Paypal implements OnInit {
       },
       description: producto.descripcion || ''
     }));
-
-    // Agregar el IVA como un item separado
-    items.push({
-      name: 'IVA (16%)',
-      quantity: '1',
-      category: 'PHYSICAL_GOODS' as const,
-      unit_amount: {
-        currency_code: 'USD',
-        value: iva.toFixed(2),
-      },
-      description: 'Impuesto al Valor Agregado'
-    });
 
     this.payPalConfig = {
       currency: 'USD',
@@ -72,7 +68,7 @@ export class Paypal implements OnInit {
               breakdown: {
                 item_total: {
                   currency_code: 'USD',
-                  value: total.toFixed(2)
+                  value: subtotal.toFixed(2)
                 }
               }
             },
