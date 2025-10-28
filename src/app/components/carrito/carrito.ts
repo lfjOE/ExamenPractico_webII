@@ -39,20 +39,41 @@ export class CarritoComponent {
     this.carritoService.agregar(producto);
   }
 
-  procederCompra() {
-    if (this.carritoService.productos().length === 0) {
-      alert('El carrito está vacío');
-      return;
-    }
+  async procederCompra() {
+  if (this.carritoService.productos().length === 0) {
+    alert('El carrito está vacío');
+    return;
+  }
+
+  const raw = localStorage.getItem('materialhub_user');
+  const user = raw ? JSON.parse(raw) : null;
+  const user_id = user?.user_id ?? 0;
+  if (!user_id) { alert('Inicia sesión para completar la compra'); return; }
+
+  const productos = (this.carritoService.productos() || []).map(p => ({
+    id_producto: p.id_producto,
+    cantidad: 1
+  }));
+
+  try {
+    const res = await fetch('/api/pedidos/crear', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ user_id, productos, repartidor_id: 1 })
+    });
+    const data = await res.json();
+    if (!res.ok) throw new Error(data?.error || 'Error al crear pedido');
 
     const recibo = this.carritoService.generarRecibo();
     const xml = this.carritoService.generarXML(recibo);
-
     const filename = `recibo_${recibo.id}.xml`;
     this.carritoService.descargarXML(xml, filename);
 
-    alert(`Compra procesada por $${recibo.total.toFixed(2)}\nRecibo guardado como ${filename}`);
-
+    alert(`Pedido #${data.id_pedido} creado. Compra por $${recibo.total.toFixed(2)}. Recibo guardado como ${filename}`);
     this.carritoService.vaciar();
+  } catch (e: any) {
+    alert(e?.message || 'Error al crear pedido');
   }
+}
+
 }

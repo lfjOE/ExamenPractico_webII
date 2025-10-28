@@ -1,6 +1,8 @@
 import { Component } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
+import { AuthService } from '../../auth.service';
+import { UiStateService } from '../../ui-state.service';
 
 @Component({
   selector: 'app-login',
@@ -15,6 +17,8 @@ export class LoginComponent {
   message = '';
   user: any = null;
 
+  constructor(private auth: AuthService, private ui: UiStateService) {}
+
   async ingresar() {
     this.loading = true;
     this.message = '';
@@ -28,7 +32,9 @@ export class LoginComponent {
       const data = await res.json();
       if (!res.ok) throw new Error(data?.error || 'Error');
       this.user = data;
+      this.auth.login(data);
       this.message = 'Inicio de sesión exitoso';
+      this.ui.setView('catalogo');
     } catch (e: any) {
       this.message = e?.message || 'Error';
     } finally {
