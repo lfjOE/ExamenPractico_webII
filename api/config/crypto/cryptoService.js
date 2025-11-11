@@ -14,7 +14,6 @@ export function encryptPassword(plaintext) {
 export function decryptPassword(b64) {
   const key = getSymKey();
   const buf = Buffer.from(String(b64), 'base64');
-  if (buf.length < 38) throw new Error('Criptograma inválido');
 
   const iv = buf.subarray(0, 12);
   const tag = buf.subarray(buf.length - 16);

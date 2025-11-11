@@ -24,7 +24,7 @@ export class LoginComponent {
     this.message = '';
     this.user = null;
     try {
-      const res = await fetch('/api/usuarios/login', {
+      const res = await fetch('http://localhost:4000/api/usuarios/login', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify(this.model)

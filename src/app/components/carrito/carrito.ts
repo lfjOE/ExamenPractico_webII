@@ -56,7 +56,7 @@ export class CarritoComponent {
   }));
 
   try {
-    const res = await fetch('/api/pedidos/crear', {
+    const res = await fetch('http://localhost:4000/api/pedidos/crear', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({ user_id, productos, repartidor_id: 1 })

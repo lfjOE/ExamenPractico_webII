@@ -18,7 +18,7 @@ export class SignupComponent {
     this.loading = true;
     this.message = '';
     try {
-      const res = await fetch('/api/usuarios/registrar', {
+      const res = await fetch('http://localhost:4000/api/usuarios/registrar', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify(this.model)
