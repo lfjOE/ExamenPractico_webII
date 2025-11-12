@@ -1,6 +1,6 @@
 import { Injectable } from '@angular/core';
 
-export type View = 'catalogo' | 'login' | 'signup';
+export type View = 'catalogo' | 'login' | 'signup' | 'forgot-password';
 
 @Injectable({ providedIn: 'root' })
 export class UiStateService {

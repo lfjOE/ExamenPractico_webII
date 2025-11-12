@@ -17,7 +17,7 @@ export class LoginComponent {
   message = '';
   user: any = null;
 
-  constructor(private auth: AuthService, private ui: UiStateService) {}
+  constructor(private auth: AuthService, private ui: UiStateService) { }
 
   async ingresar() {
     this.loading = true;

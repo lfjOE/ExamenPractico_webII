@@ -1,17 +1,39 @@
 <header style="background:#e98f3b;color:#000;padding:14px 16px;display:flex;align-items:center;justify-content:space-between;font-family:Arial,sans-serif">
   <h1 style="margin:0">MaterialHub 🛠️</h1>
   <div>
-    <button *ngIf="view==='catalogo' && !isLoggedIn()" (click)="goSignup()" style="border:none;padding:8px 12px;background:#333;color:#fff;cursor:pointer;margin-right:8px">Crear cuenta</button>
-    <button *ngIf="view==='catalogo' && !isLoggedIn()" (click)="goLogin()" style="border:none;padding:8px 12px;background:#000;color:#fff;cursor:pointer">Iniciar sesión</button>
-    <button *ngIf="view==='catalogo' && isLoggedIn()" (click)="logout()" style="border:none;padding:8px 12px;background:#000;color:#fff;cursor:pointer">Cerrar sesión</button>
-    <button *ngIf="view!=='catalogo'" (click)="goCatalogo()" style="border:none;padding:8px 12px;background:#000;color:#fff;cursor:pointer">Volver al catálogo</button>
+    <!-- Botones que se muestran solo en catálogo -->
+    <button 
+      *ngIf="isOnCatalogoPage() && !isLoggedIn()" 
+      routerLink="/signup"
+      style="border:none;padding:8px 12px;background:#333;color:#fff;cursor:pointer;margin-right:8px">
+      Crear cuenta
+    </button>
+    
+    <button 
+      *ngIf="isOnCatalogoPage() && !isLoggedIn()" 
+      routerLink="/login"
+      style="border:none;padding:8px 12px;background:#000;color:#fff;cursor:pointer">
+      Iniciar sesión
+    </button>
+    
+    <button 
+      *ngIf="isOnCatalogoPage() && isLoggedIn()" 
+      (click)="logout()"
+      style="border:none;padding:8px 12px;background:#000;color:#fff;cursor:pointer">
+      Cerrar sesión
+    </button>
+    
+    <!-- Botón para volver al catálogo desde cualquier página de auth -->
+    <button 
+      *ngIf="isOnAuthPage()" 
+      routerLink="/"
+      style="border:none;padding:8px 12px;background:#000;color:#fff;cursor:pointer">
+      Volver al catálogo
+    </button>
   </div>
 </header>
 
 <main>
-  <app-carrito *ngIf="view==='catalogo'"></app-carrito>
-  <app-signup *ngIf="view==='signup'"></app-signup>
-  <app-login *ngIf="view==='login'"></app-login>
+  <router-outlet></router-outlet>
+  
 </main>
-
-<router-outlet></router-outlet>
