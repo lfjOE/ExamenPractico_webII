@@ -280,3 +280,39 @@ app-paypal {
     gap: 15px;
   }
 }
+
+
+/* Estilos generales del contenedor */
+.container {
+  padding: 20px;
+  max-width: 1200px;
+  margin: 0 auto;
+}
+
+/* Header con botón de crear */
+.header-actions {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 20px;
+}
+
+h2 {
+  color: #333;
+  margin: 0;
+}
+
+.btn-crear {
+  background-color: #28a745;
+  color: white;
+  border: none;
+  padding: 10px 20px;
+  border-radius: 4px;
+  cursor: pointer;
+  font-size: 1rem;
+  transition: background-color 0.2s;
+}
+
+.btn-crear:hover {
+  background-color: #218838;
+}

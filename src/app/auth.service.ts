@@ -4,6 +4,13 @@ export interface AuthUser {
   user_id: number;
   username: string;
   email: string;
+  tipo: string; // <-- nuevo campo (ej: 'admin', 'cliente', 'vendedor')
+}
+
+export interface AuthUser {
+  user_id: number;
+  username: string;
+  email: string;
 }
 
 @Injectable({ providedIn: 'root' })

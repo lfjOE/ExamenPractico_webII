@@ -4,6 +4,7 @@ import dotenv from 'dotenv';
 import catalogoRoutes from './routes/catalogoRoutes.js';
 import usuarioRoutes from './routes/usuarioRoutes.js';
 import pedidoRoutes from './routes/pedidoRoutes.js';
+import inventarioRoutes from './routes/inventarioRoutes.js';
 import { ensureKeysOnBoot } from './config/crypto/keyManager.js';
 
 dotenv.config();
@@ -16,6 +17,7 @@ app.use(express.json());
 app.use('/api/catalogo', catalogoRoutes);
 app.use('/api/usuarios', usuarioRoutes);
 app.use('/api/pedidos', pedidoRoutes);
+app.use('/api/inventario', inventarioRoutes);
 
 const PORT = process.env.PORT || 4000;
 app.listen(PORT, '0.0.0.0', () => {

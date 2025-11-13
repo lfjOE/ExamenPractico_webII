@@ -1,0 +1,218 @@
+<div class="container">
+    <div class="header-actions">
+        <h2>Inventario de Productos</h2>
+        <button class="btn-crear" (click)="abrirModalCrear()">
+            + Nuevo Producto
+        </button>
+    </div>
+
+    <div class="table-container">
+        <table class="productos-table">
+            <thead>
+                <tr>
+                    <th>ID</th>
+                    <th>Imagen</th>
+                    <th>Nombre</th>
+                    <th>Descripción</th>
+                    <th>Precio</th>
+                    <th>Cantidad</th>
+                    <th>Acciones</th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr *ngFor="let producto of productosDisponibles; let i = index">
+                    <td>{{ producto.id_producto }}</td>
+                    <td class="emoji-cell">{{ producto.imagen }}</td>
+                    <td>{{ producto.nombre }}</td>
+                    <td>{{producto.descripcion}}</td>
+                    <td>{{ producto.precio | currency }}</td>
+                    <td>{{ producto.cantidad }}</td>
+                    <td class="actions">
+                        <button class="btn-editar" (click)="editarProducto(producto)">Editar</button>
+                        <button class="btn-eliminar" (click)="eliminarProducto(producto.id_producto, i)">
+                            Eliminar
+                        </button>
+                    </td>
+                </tr>
+
+                <tr *ngIf="productosDisponibles.length === 0 && !isLoading">
+                    <td colspan="6" class="no-products">
+                        No hay productos disponibles
+                    </td>
+                </tr>
+            </tbody>
+        </table>
+    </div>
+
+    <!-- Loading indicator -->
+    <div *ngIf="isLoading" class="loading">
+        Cargando productos...
+    </div>
+
+    <!-- Modal de Edición -->
+    <div *ngIf="mostrarModalEditar" class="modal-overlay" (click)="cerrarModalEditar()">
+        <div class="modal-content" (click)="$event.stopPropagation()">
+            <div class="modal-header">
+                <h3>Editar Producto</h3>
+                <button class="btn-cerrar" (click)="cerrarModalEditar()">&times;</button>
+            </div>
+
+            <div class="modal-body">
+                <form (ngSubmit)="guardarCambios()" #editarForm="ngForm">
+                    <div class="form-group">
+                        <label for="nombreEditar">Nombre:</label>
+                        <input type="text" id="nombreEditar" name="nombre" [(ngModel)]="productoEditando!.nombre"
+                            required #nombreEditar="ngModel" class="form-control">
+                        <div *ngIf="nombreEditar.invalid && nombreEditar.touched" class="error-message">
+                            El nombre es requerido
+                        </div>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="descripcionEditar">Descripción:</label>
+                        <input type="text" id="descripcionEditar" name="descripcion"
+                            [(ngModel)]="productoEditando!.descripcion" required #descripcionEditar="ngModel"
+                            class="form-control" placeholder="Ingresa la descripción del producto">
+                        <div *ngIf="descripcionEditar.invalid && descripcionEditar.touched" class="error-message">
+                            La descripción es requerida
+                        </div>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="precioEditar">Precio:</label>
+                        <input type="number" id="precioEditar" name="precio" [(ngModel)]="productoEditando!.precio"
+                            required min="0" step="0.01" #precioEditar="ngModel" class="form-control">
+                        <div *ngIf="precioEditar.invalid && precioEditar.touched" class="error-message">
+                            El precio debe ser mayor o igual a 0
+                        </div>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="cantidadEditar">Cantidad:</label>
+                        <input type="number" id="cantidadEditar" name="cantidad"
+                            [(ngModel)]="productoEditando!.cantidad" required min="0" #cantidadEditar="ngModel"
+                            class="form-control">
+                        <div *ngIf="cantidadEditar.invalid && cantidadEditar.touched" class="error-message">
+                            La cantidad debe ser mayor o igual a 0
+                        </div>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="imagenEditar">Emoji:</label>
+                        <div class="emoji-selector">
+                            <input type="text" id="imagenEditar" name="imagen" [(ngModel)]="productoEditando!.imagen"
+                                #imagenEditar="ngModel" class="form-control emoji-input"
+                                placeholder="Selecciona o escribe un emoji" maxlength="2">
+                            <div class="emoji-preview">
+                                {{ productoEditando!.imagen || '🔨' }}
+                            </div>
+                        </div>
+
+                        <div class="common-emojis">
+                            <p>Emojis sugeridos:</p>
+                            <div class="emoji-grid">
+                                <span *ngFor="let emoji of emojisSugeridos" class="emoji-option"
+                                    [class.selected]="productoEditando!.imagen === emoji"
+                                    (click)="seleccionarEmoji(emoji, false)">
+                                    {{ emoji }}
+                                </span>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="form-actions">
+                        <button type="button" class="btn-cancelar" (click)="cerrarModalEditar()">
+                            Cancelar
+                        </button>
+                        <button type="submit" class="btn-guardar" [disabled]="!editarForm.form.valid">
+                            Guardar Cambios
+                        </button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+
+    <!-- Modal de Crear -->
+    <div *ngIf="mostrarModalCrear" class="modal-overlay" (click)="cerrarModalCrear()">
+        <div class="modal-content" (click)="$event.stopPropagation()">
+            <div class="modal-header">
+                <h3>Crear Nuevo Producto</h3>
+                <button class="btn-cerrar" (click)="cerrarModalCrear()">&times;</button>
+            </div>
+
+            <div class="modal-body">
+                <form (ngSubmit)="crearProducto()" #crearForm="ngForm">
+                    <div class="form-group">
+                        <label for="nombreCrear">Nombre:</label>
+                        <input type="text" id="nombreCrear" name="nombre" [(ngModel)]="productoNuevo.nombre" required
+                            #nombreCrear="ngModel" class="form-control" placeholder="Ingresa el nombre del producto">
+                        <div *ngIf="nombreCrear.invalid && nombreCrear.touched" class="error-message">
+                            El nombre es requerido
+                        </div>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="nombreCrear">Descripción:</label>
+                        <input type="text" id="descripcionCrear" name="descripcion"
+                            [(ngModel)]="productoNuevo.descripcion" required #descripcionCrear="ngModel"
+                            class="form-control" placeholder="Ingresa la descripción del producto">
+                        <div *ngIf="descripcionCrear.invalid && descripcionCrear.touched" class="error-message">
+                            La descripción es requerida
+                        </div>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="precioCrear">Precio:</label>
+                        <input type="number" id="precioCrear" name="precio" [(ngModel)]="productoNuevo.precio" required
+                            min="0" step="0.01" #precioCrear="ngModel" class="form-control" placeholder="0.00">
+                        <div *ngIf="precioCrear.invalid && precioCrear.touched" class="error-message">
+                            El precio debe ser mayor o igual a 0
+                        </div>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="cantidadCrear">Cantidad:</label>
+                        <input type="number" id="cantidadCrear" name="cantidad" [(ngModel)]="productoNuevo.cantidad"
+                            required min="0" #cantidadCrear="ngModel" class="form-control" placeholder="0">
+                        <div *ngIf="cantidadCrear.invalid && cantidadCrear.touched" class="error-message">
+                            La cantidad debe ser mayor o igual a 0
+                        </div>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="imagenCrear">Emoji:</label>
+                        <div class="emoji-selector">
+                            <input type="text" id="imagenCrear" name="imagen" [(ngModel)]="productoNuevo.imagen"
+                                #imagenCrear="ngModel" class="form-control emoji-input"
+                                placeholder="Selecciona o escribe un emoji" maxlength="2">
+                            <div class="emoji-preview">
+                                {{ productoNuevo.imagen || '🔨' }}
+                            </div>
+                        </div>
+
+                        <div class="common-emojis">
+                            <p>Emojis sugeridos:</p>
+                            <div class="emoji-grid">
+                                <span *ngFor="let emoji of emojisSugeridos" class="emoji-option"
+                                    [class.selected]="productoNuevo.imagen === emoji"
+                                    (click)="seleccionarEmoji(emoji, true)">
+                                    {{ emoji }}
+                                </span>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="form-actions">
+                        <button type="button" class="btn-cancelar" (click)="cerrarModalCrear()">
+                            Cancelar
+                        </button>
+                        <button type="submit" class="btn-guardar" [disabled]="!crearForm.form.valid">
+                            Crear Producto
+                        </button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>

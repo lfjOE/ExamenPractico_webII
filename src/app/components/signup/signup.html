@@ -1,24 +1,209 @@
 <div class="signup-wrap">
   <h2>Crear cuenta</h2>
 
-  <form (ngSubmit)="registrar()" #f="ngForm" class="form">
-    <label>Usuario</label>
-    <input name="username" [(ngModel)]="model.username" required />
+  <form #f="ngForm" (ngSubmit)="registrar(f)" class="form">
+    <!-- Nombre y Apellidos -->
+    <div class="row">
+      <div>
+        <label>Nombre*</label>
+        <input name="nombre" [(ngModel)]="model.nombre" required />
+      </div>
+      <div>
+        <label>Apellidos*</label>
+        <input name="apellidos" [(ngModel)]="model.apellidos" required />
+      </div>
+    </div>
 
-    <label>Correo</label>
+    <!-- Email -->
+    <label>Email*</label>
     <input type="email" name="email" [(ngModel)]="model.email" required />
 
-    <label>Apellido</label>
-    <input name="lastname" [(ngModel)]="model.lastname" />
+    <!-- Código país y teléfono -->
+    <div class="row">
+      <div>
+        <label>Código de país*</label>
+        <input name="codigo_pais" [(ngModel)]="model.codigo_pais" placeholder="+52" required />
+      </div>
+      <div>
+        <label>Teléfono*</label>
+        <input name="telefono" [(ngModel)]="model.telefono" required />
+      </div>
+    </div>
 
-    <label>Contraseña</label>
-    <input type="password" name="password" [(ngModel)]="model.password" required />
+    <!-- Contraseña y confirmación -->
+    <div class="row">
+      <div>
+        <label>Contraseña*</label>
+        <input type="password" name="password" [(ngModel)]="model.password" required />
+      </div>
+      <div>
+        <label>Confirmar contraseña*</label>
+        <input type="password" name="confirmar_password" [(ngModel)]="model.confirmar_password" required />
+      </div>
+    </div>
 
-    <label>Fecha de nacimiento</label>
-    <input type="date" name="birthdate" [(ngModel)]="model.birthdate" />
+    <!-- Fecha de nacimiento -->
+    <label>Fecha de nacimiento*</label>
+    <input type="date" name="fecha_nacimiento" [(ngModel)]="model.fecha_nacimiento" required />
 
+    <!-- Calle y número -->
+    <div class="row">
+      <div class="wide">
+        <label>Calle*</label>
+        <input name="calle" [(ngModel)]="model.calle" required />
+      </div>
+      <div>
+        <label>Núm. ext*</label>
+        <input name="numero_externo" [(ngModel)]="model.numero_externo" required />
+      </div>
+      <div>
+        <label>Núm. int</label>
+        <input name="numero_interno" [(ngModel)]="model.numero_interno" />
+      </div>
+    </div>
+
+    <!-- Colonia y código postal -->
+    <div class="row">
+      <div class="wide">
+        <label>Colonia*</label>
+        <input name="colonia" [(ngModel)]="model.colonia" required />
+      </div>
+      <div>
+        <label>C.P.*</label>
+        <input name="codigo_postal" [(ngModel)]="model.codigo_postal" required />
+      </div>
+    </div>
+
+    <!-- Municipio -->
+    <label>Municipio*</label>
+    <select name="municipio" [(ngModel)]="model.municipio" required>
+<option value="">Seleccione...</option>
+<option>Acatic</option>
+<option>Acatlán de Juárez</option>
+<option>Ahualulco de Mercado</option>
+<option>Amacueca</option>
+<option>Amatitán</option>
+<option>Ameca</option>
+<option>Arandas</option>
+<option>Atemajac de Brizuela</option>
+<option>Atengo</option>
+<option>Atenguillo</option>
+<option>Atotonilco el Alto</option>
+<option>Atoyac</option>
+<option>Autlán de Navarro</option>
+<option>Ayotlán</option>
+<option>Ayutla</option>
+<option>Bolaños</option>
+<option>Cabo Corrientes</option>
+<option>Cañadas de Obregón</option>
+<option>Casimiro Castillo</option>
+<option>Chapala</option>
+<option>Chimaltitán</option>
+<option>Chiquilistlán</option>
+<option>Cihuatlán</option>
+<option>Cocula</option>
+<option>Colotlán</option>
+<option>Concepción de Buenos Aires</option>
+<option>Cuautitlán de García Barragán</option>
+<option>Cuautla</option>
+<option>Cuquío</option>
+<option>Degollado</option>
+<option>Ejutla</option>
+<option>El Arenal</option>
+<option>El Grullo</option>
+<option>El Limón</option>
+<option>El Salto</option>
+<option>Encarnación de Díaz</option>
+<option>Etzatlán</option>
+<option>Gómez Farías</option>
+<option>Guachinango</option>
+<option>Guadalajara</option>
+<option>Hostotipaquillo</option>
+<option>Huejúcar</option>
+<option>Huejuquilla el Alto</option>
+<option>Ixtlahuacán de los Membrillos</option>
+<option>Ixtlahuacán del Río</option>
+<option>Jalostotitlán</option>
+<option>Jamay</option>
+<option>Jesús María</option>
+<option>Jilotlán de los Dolores</option>
+<option>Jocotepec</option>
+<option>Juanacatlán</option>
+<option>Juchitlán</option>
+<option>La Barca</option>
+<option>La Huerta</option>
+<option>La Manzanilla de la Paz</option>
+<option>Lagos de Moreno</option>
+<option>Magdalena</option>
+<option>Mascota</option>
+<option>Mazamitla</option>
+<option>Mexticacán</option>
+<option>Mezquitic</option>
+<option>Mixtlán</option>
+<option>Ocotlán</option>
+<option>Ojuelos de Jalisco</option>
+<option>Pihuamo</option>
+<option>Poncitlán</option>
+<option>Puerto Vallarta</option>
+<option>Quitupan</option>
+<option>San Cristóbal de la Barranca</option>
+<option>San Diego de Alejandría</option>
+<option>San Gabriel</option>
+<option>San Juan de los Lagos</option>
+<option>San Juanito de Escobedo</option>
+<option>San Julián</option>
+<option>San Marcos</option>
+<option>San Martín de Bolaños</option>
+<option>San Martín Hidalgo</option>
+<option>San Miguel el Alto</option>
+<option>San Sebastián del Oeste</option>
+<option>Santa María de los Ángeles</option>
+<option>Santa María del Oro</option>
+<option>Sayula</option>
+<option>Tala</option>
+<option>Talpa de Allende</option>
+<option>Tamazula de Gordiano</option>
+<option>Tapalpa</option>
+<option>Tecalitlán</option>
+<option>Techaluta de Montenegro</option>
+<option>Tecolotlán</option>
+<option>Tenamaxtlán</option>
+<option>Teocaltiche</option>
+<option>Teocuitatlán de Corona</option>
+<option>Tepatitlán de Morelos</option>
+<option>Tequila</option>
+<option>Teuchitlán</option>
+<option>Tizapán el Alto</option>
+<option>Tlajomulco de Zúñiga</option>
+<option>Tlaquepaque</option>
+<option>Tolimán</option>
+<option>Tomatlán</option>
+<option>Tonalá</option>
+<option>Tonaya</option>
+<option>Tonila</option>
+<option>Totatiche</option>
+<option>Tototlán</option>
+<option>Tuxcacuesco</option>
+<option>Tuxcueca</option>
+<option>Tuxpan</option>
+<option>Unión de San Antonio</option>
+<option>Unión de Tula</option>
+<option>Valle de Guadalupe</option>
+<option>Valle de Juárez</option>
+<option>Villa Corona</option>
+<option>Villa Guerrero</option>
+<option>Villa Hidalgo</option>
+<option>Villa Purificación</option>
+<option>Yahualica de González Gallo</option>
+<option>Zacoalco de Torres</option>
+<option>Zapopan</option>
+<option>Zapotiltic</option>
+<option>Zapotlanejo</option>
+    </select>
+
+    <!-- Botón -->
     <button type="submit" [disabled]="loading || !f.valid">
-      {{ loading ? 'Creando…' : 'Crear cuenta' }}
+      {{ loading ? 'Registrando…' : 'Crear cuenta' }}
     </button>
   </form>
 

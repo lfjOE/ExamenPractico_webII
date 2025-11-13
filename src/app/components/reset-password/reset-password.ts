@@ -32,7 +32,6 @@ export class ResetPassword implements OnInit {
   }
 
   ngOnInit() {
-    // Obtener token y email de los parámetros de la URL
     this.route.queryParams.subscribe(params => {
       this.token = params['token'] || null;
       this.email = params['email'] || null;

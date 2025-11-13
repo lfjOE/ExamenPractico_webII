@@ -25,56 +25,175 @@ function timingSafeEqStr(a, b) {
   return timingSafeEqual(A, B);
 }
 
-export const registrarUsuario = (req, res) => {
+export const registrarCliente = (req, res) => {
   try {
-    let { username, email, password, lastname, birthdate } = req.body || {};
-    if (!username || !email || !password) {
-      return res.status(400).json({ error: 'username, email y password son obligatorios' });
+    const {
+      email,
+      password,
+      nombre,
+      apellido,
+      telefono,
+      direccion,
+      ciudad,
+      fecha_nacimiento
+    } = req.body || {};
+
+    // Validación básica
+    if (!email || !password || !nombre) {
+      return res.status(400).json({ error: 'Nombre, email y contraseña son obligatorios.' });
     }
 
-    username = limitLen(username, 30);
-    email = limitLen(email, 50);
-    lastname = lastname ? limitLen(lastname, 50) : null;
-    const bdate = parseBirthdate(birthdate); // NULL si vacío o formato inválido
     const hashedPass = sha512(String(password));
 
-    // 1) ¿email o username ya usado?
-    const sqlCheck = 'SELECT user_id FROM usuario WHERE email = ? OR username = ? LIMIT 1';
-    db.query(sqlCheck, [email, username], (errC, rowsC) => {
-      if (errC) {
-        console.error('[registrarUsuario] check error:', errC);
-        return res.status(500).json({ error: 'Error de base de datos (check)' });
+    // 1️⃣ Verificar si el email ya existe
+    const sqlCheck = 'SELECT user_id FROM usuario WHERE email = ? LIMIT 1';
+    db.query(sqlCheck, [email], (errCheck, rowsCheck) => {
+      if (errCheck) {
+        console.error('Error verificando email:', errCheck);
+        return res.status(500).json({ error: 'Error en base de datos al verificar el email.' });
       }
-      if (rowsC && rowsC.length > 0) {
-        return res.status(409).json({ error: 'Email o username ya registrados' });
+      if (rowsCheck.length > 0) {
+        return res.status(409).json({ error: 'El correo ya está registrado.' });
       }
 
-      // 2) Obtener nextId porque user_id NO es AUTO_INCREMENT en tu SQL
+      // 2️⃣ Obtener el siguiente user_id manualmente (porque usuario no es autoincrement)
       const sqlNext = 'SELECT COALESCE(MAX(user_id), 0) + 1 AS nextId FROM usuario';
-      db.query(sqlNext, [], (errN, rowsN) => {
-        if (errN) {
-          console.error('[registrarUsuario] nextId error:', errN);
-          return res.status(500).json({ error: 'Error de base de datos (id)' });
+      db.query(sqlNext, [], (errNext, rowsNext) => {
+        if (errNext) {
+          console.error('Error obteniendo siguiente user_id:', errNext);
+          return res.status(500).json({ error: 'Error al obtener el siguiente ID de usuario.' });
         }
-        const nextId = (rowsN && rowsN[0] && rowsN[0].nextId) ? rowsN[0].nextId : 1;
 
-        // 3) Insert acorde al esquema adjunto
-        const sqlIns = `
-          INSERT INTO usuario (user_id, username, email, lastname, password, birthdate)
-          VALUES (?, ?, ?, ?, ?, ?)
+        const nextUserId = rowsNext[0].nextId;
+
+        // 3️⃣ Insertar usuario
+        const sqlUser = `
+          INSERT INTO usuario (user_id, email, password, tipo_usuario)
+          VALUES (?, ?, ?, 'cliente')
         `;
-        db.query(sqlIns, [nextId, username, email, lastname, hashedPass, bdate], (errI, r) => {
-          if (errI) {
-            console.error('[registrarUsuario] insert error:', errI);
-            return res.status(500).json({ error: 'Error de base de datos (insert)' });
+        db.query(sqlUser, [nextUserId, email, hashedPass], (errUser) => {
+          if (errUser) {
+            console.error('Error insertando usuario:', errUser);
+            return res.status(500).json({ error: 'Error insertando datos del usuario.' });
           }
-          return res.status(201).json({ ok: true, user_id: nextId, username, email });
+
+          // 4️⃣ Insertar cliente (cliente_id se autoincrementa)
+          const sqlCliente = `
+            INSERT INTO cliente (user_id, nombre, apellido, telefono, direccion, ciudad, fecha_nacimiento)
+            VALUES (?, ?, ?, ?, ?, ?, ?)
+          `;
+          db.query(
+            sqlCliente,
+            [
+              nextUserId,
+              nombre,
+              apellido,
+              telefono,
+              direccion,
+              ciudad,
+              fecha_nacimiento || null
+            ],
+            (errCliente) => {
+              if (errCliente) {
+                console.error('Error insertando cliente:', errCliente);
+                return res.status(500).json({ error: 'Error insertando datos del cliente.' });
+              }
+
+              return res.status(201).json({
+                ok: true,
+                message: 'Cliente registrado correctamente.',
+                user_id: nextUserId,
+                email,
+                tipo_usuario: 'cliente'
+              });
+            }
+          );
         });
       });
     });
   } catch (e) {
-    console.error('[registrarUsuario] fatal:', e);
-    return res.status(500).json({ error: 'Error interno' });
+    console.error('[registrarCliente] Fatal:', e);
+    return res.status(500).json({ error: 'Error interno del servidor.' });
+  }
+};
+
+export const registrarRepartidor = (req, res) => {
+  try {
+    const {
+      nombre,
+      apellidos,
+      email,
+      codigo_pais,
+      telefono,
+      municipio,
+      fecha_nacimiento,
+      contrasena_provisional
+    } = req.body || {};
+
+    if (!nombre || !apellidos || !email || !contrasena_provisional) {
+      return res.status(400).json({ error: 'Faltan datos obligatorios' });
+    }
+
+    const hashedPass = sha512(String(contrasena_provisional));
+
+    // 1) Validar si el email ya existe
+    const sqlCheck = 'SELECT user_id FROM usuario WHERE email = ? LIMIT 1';
+    db.query(sqlCheck, [email], (errC, rowsC) => {
+      if (errC) return res.status(500).json({ error: 'Error en base de datos (check)' });
+      if (rowsC.length > 0) return res.status(409).json({ error: 'Email ya registrado' });
+
+      // 2) Obtener el siguiente ID
+      const sqlNext = 'SELECT COALESCE(MAX(user_id), 0) + 1 AS nextId FROM usuario';
+      db.query(sqlNext, [], (errN, rowsN) => {
+        if (errN) return res.status(500).json({ error: 'Error al obtener ID' });
+        const nextUserId = rowsN[0].nextId;
+
+        // 3) Insertar en usuario
+        const sqlUser = `
+          INSERT INTO usuario (user_id, email, password, tipo_usuario)
+          VALUES (?, ?, ?, 'repartidor')
+        `;
+        db.query(sqlUser, [nextUserId, email, hashedPass], (errU) => {
+          if (errU) return res.status(500).json({ error: 'Error insertando usuario' });
+
+          // 4) Insertar en tabla repartidor
+          const sqlRep = `
+            INSERT INTO repartidor (repartidor_id, user_id, nombre, apellidos, email, codigo_pais, telefono, municipio, fecha_nacimiento, contrasena_provisional)
+            VALUES ((SELECT COALESCE(MAX(repartidor_id), 0) + 1 FROM repartidor), ?, ?, ?, ?, ?, ?, ?, ?, ?)
+          `;
+          db.query(
+            sqlRep,
+            [
+              nextUserId,
+              nombre,
+              apellidos,
+              email,
+              codigo_pais,
+              telefono,
+              municipio,
+              fecha_nacimiento || null,
+              hashedPass
+            ],
+            (errR) => {
+              if (errR) {
+                console.error('Error insertando repartidor:', errR);
+                return res.status(500).json({ error: 'Error insertando datos del repartidor' });
+              }
+
+              return res.status(201).json({
+                ok: true,
+                user_id: nextUserId,
+                email,
+                tipo_usuario: 'repartidor'
+              });
+            }
+          );
+        });
+      });
+    });
+  } catch (e) {
+    console.error('[registrarRepartidor] fatal:', e);
+    return res.status(500).json({ error: 'Error interno del servidor' });
   }
 };
 
@@ -86,12 +205,13 @@ export const loginUsuario = (req, res) => {
     }
 
     const sql = `
-      SELECT user_id, username, email, password
+      SELECT user_id, email, password, tipo_usuario
       FROM usuario
-      WHERE email = ? OR username = ?
+      WHERE email = ?
       LIMIT 1
     `;
-    db.query(sql, [usernameOrEmail, usernameOrEmail], (err, rows) => {
+
+    db.query(sql, [usernameOrEmail], (err, rows) => {
       if (err) {
         console.error('[loginUsuario] select error:', err);
         return res.status(500).json({ error: 'Error de base de datos' });
@@ -101,18 +221,27 @@ export const loginUsuario = (req, res) => {
       }
 
       const user = rows[0];
-
       const hashedPass = sha512(String(password));
       const ok = user.password === hashedPass;
-      if (!ok) return res.status(401).json({ error: 'Credenciales inválidas' });
 
-      res.json({ ok: true, user_id: user.user_id, username: user.username, email: user.email });
+      if (!ok) {
+        return res.status(401).json({ error: 'Credenciales inválidas' });
+      }
+
+      res.json({
+        ok: true,
+        user_id: user.user_id,
+        email: user.email,
+        tipo: user.tipo_usuario
+      });
+      console.log(`Usuario ${user.email} (ID ${user.user_id}) ha iniciado sesión con tipo ${user.tipo_usuario}`);
     });
   } catch (e) {
     console.error('[loginUsuario] fatal:', e);
     return res.status(500).json({ error: 'Error interno' });
   }
 };
+
 
 export const recoverPassword = async (req, res) => {
   try {
@@ -129,7 +258,7 @@ export const recoverPassword = async (req, res) => {
 
     // Buscar usuario en base de datos
 
-    const sql = 'SELECT user_id, username, email FROM usuario WHERE email = ? LIMIT 1'
+    const sql = 'SELECT user_id, email FROM usuario WHERE email = ? LIMIT 1'
 
     db.query(sql, [email], (err, rows) => {
       if (err) {
@@ -178,12 +307,12 @@ export const recoverPassword = async (req, res) => {
           const resetLink = `http://localhost:4200/reset-password?token=${resetToken}&email=${email}`;
 
           transporter.sendMail({
-            from: '"Mi App" <noreply@miapp.com>',
+            from: '"MaterialHub"',
             to: email,
             subject: 'Recuperación de Contraseña',
             html: `
         <h2>Recuperación de Contraseña</h2>
-        <p>Hola ${user.username},</p>
+        <p>Hola usuario, has solicitado una recuperacion de contraseña</p>
         <p>Haz clic en el siguiente enlace para restablecer tu contraseña:</p>
         <a href="${resetLink}">${resetLink}</a>
         <p>Este enlace expira en 1 hora.</p>

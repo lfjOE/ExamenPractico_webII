@@ -42,7 +42,7 @@
             </div>
             <div class="producto-actions">
               <span class="precio">${{ producto.precio }}</span>
-              <button (click)="quitar(producto.id_producto); $event.stopPropagation()" class="btn-quitar">
+              <button (click)="quitar(producto.id_producto!); $event.stopPropagation()" class="btn-quitar">
                 X
               </button>
             </div>
