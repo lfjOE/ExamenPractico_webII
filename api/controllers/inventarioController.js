@@ -2,7 +2,7 @@ import db from '../config/db.js';
 
 
 export const obtenerInventario = (req, res) => {
-    const sql = "SELECT id_producto, nombre, descripcion, precio, cantidad, imagen FROM producto WHERE vigente = 1 ORDER BY id_producto";
+    const sql = "SELECT id_producto, nombre, descripcion, precio, cantidad, imagen, vigente FROM producto ORDER BY id_producto";
     db.query(sql, (err, results) => {
         if (err) {
             return res.status(500).json({ error: 'Error al obtener los productos' });
@@ -14,17 +14,16 @@ export const obtenerInventario = (req, res) => {
 
 export const agregarProducto = (req, res) => {
     try {
-        const { imagen, nombre, descripcion, precio, cantidad } = req.body || {};
+        const { imagen, nombre, descripcion, precio, cantidad, vigente } = req.body || {};
+        console.log("VIGENCIA RECIBIDA " + vigente)
 
-        if (!nombre || !precio) {
-            return res.status(400).json({ error: 'Nombre y precio son obligatorios.' });
-        }
 
         const sql = `
-      INSERT INTO producto (imagen, nombre, descripcion, precio, cantidad)
-      VALUES (?, ?, ?, ?, ?)
+      INSERT INTO producto (imagen, nombre, descripcion, precio, cantidad, vigente)
+      VALUES (?, ?, ?, ?, ?, ?)
     `;
-        db.query(sql, [imagen || '', nombre, descripcion, precio, cantidad || 0,], (err, result) => {
+
+        db.query(sql, [imagen || '', nombre, descripcion, precio, cantidad || 0, vigente], (err, result) => {
             if (err) {
                 console.error('[agregarProducto] Error en base de datos:', err);
                 return res.status(500).json({ error: 'Error al insertar el producto.' });
@@ -45,16 +44,16 @@ export const agregarProducto = (req, res) => {
 
 export const editarProducto = (req, res) => {
     try {
-        const { id_producto, imagen, nombre, descripcion, precio, cantidad } = req.body || {};
+        const { id_producto, imagen, nombre, descripcion, precio, cantidad, vigente } = req.body || {};
 
         if (!id_producto) return res.status(400).json({ error: 'ID del producto es requerido.' });
 
         const sql = `
       UPDATE producto
-      SET imagen = ?, nombre = ?, descripcion = ?, precio = ?, cantidad = ?
+      SET imagen = ?, nombre = ?, descripcion = ?, precio = ?, cantidad = ?, vigente = ?
       WHERE id_producto = ?
     `;
-        db.query(sql, [imagen, nombre, descripcion, precio, cantidad, id_producto], (err, result) => {
+        db.query(sql, [imagen, nombre, descripcion, precio, cantidad, vigente, id_producto], (err, result) => {
             if (err) {
                 console.error('[editarProducto] Error actualizando:', err);
                 return res.status(500).json({ error: 'Error al actualizar producto.' });
@@ -78,7 +77,7 @@ export const editarProducto = (req, res) => {
 
 export const eliminarProducto = (req, res) => {
     try {
-        const { id } = req.params;
+        const { id } = req.body;
         if (!id) return res.status(400).json({ error: 'ID del producto es requerido.' });
 
         const sql = 'DELETE FROM producto WHERE id_producto = ?';

@@ -412,3 +412,308 @@ h2 {
     margin-top: 10px;
   }
 }
+
+.search-container {
+  margin: 20px 0;
+  padding: 0 20px;
+}
+
+.search-bar {
+  display: flex;
+  gap: 10px;
+  align-items: center;
+  max-width: 600px;
+  margin: 0 auto;
+}
+
+.search-input {
+  flex: 1;
+  padding: 12px 16px;
+  font-size: 1rem;
+  border: 2px solid #e2e8f0;
+  border-radius: 8px;
+  outline: none;
+  transition: all 0.2s;
+}
+
+.search-input:focus {
+  border-color: #3b82f6;
+  box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.1);
+}
+
+.btn-buscar {
+  padding: 12px 24px;
+  font-size: 1rem;
+  background-color: #3b82f6;
+  color: white;
+  border: none;
+  border-radius: 8px;
+  cursor: pointer;
+  font-weight: 500;
+  transition: all 0.2s;
+  white-space: nowrap;
+}
+
+.btn-buscar:hover {
+  background-color: #2563eb;
+  transform: translateY(-1px);
+  box-shadow: 0 4px 6px rgba(59, 130, 246, 0.2);
+}
+
+.btn-buscar:active {
+  transform: translateY(0);
+}
+
+.btn-limpiar {
+  padding: 12px 20px;
+  font-size: 1rem;
+  background-color: #64748b;
+  color: white;
+  border: none;
+  border-radius: 8px;
+  cursor: pointer;
+  font-weight: 500;
+  transition: all 0.2s;
+  white-space: nowrap;
+}
+
+.btn-limpiar:hover {
+  background-color: #475569;
+  transform: translateY(-1px);
+}
+
+.search-info {
+  text-align: center;
+  margin-top: 12px;
+  padding: 8px 16px;
+  background-color: #eff6ff;
+  color: #1e40af;
+  border-radius: 6px;
+  font-size: 0.95rem;
+  font-weight: 500;
+  max-width: 600px;
+  margin-left: auto;
+  margin-right: auto;
+}
+
+/* Mensaje de sin resultados */
+.no-results-message {
+  text-align: center;
+  padding: 60px 20px;
+  background-color: #f8fafc;
+  border-radius: 12px;
+  margin: 20px;
+  border: 2px dashed #cbd5e1;
+}
+
+.no-results-icon {
+  font-size: 4rem;
+  margin-bottom: 20px;
+  opacity: 0.5;
+}
+
+.no-results-message h3 {
+  color: #475569;
+  font-size: 1.5rem;
+  margin-bottom: 10px;
+}
+
+.no-results-message p {
+  color: #64748b;
+  font-size: 1.1rem;
+  margin-bottom: 20px;
+}
+
+.no-results-message strong {
+  color: #3b82f6;
+  font-weight: 600;
+}
+
+.btn-limpiar-mensaje {
+  padding: 12px 24px;
+  font-size: 1rem;
+  background-color: #3b82f6;
+  color: white;
+  border: none;
+  border-radius: 8px;
+  cursor: pointer;
+  font-weight: 500;
+  transition: all 0.2s;
+}
+
+.btn-limpiar-mensaje:hover {
+  background-color: #2563eb;
+  transform: translateY(-1px);
+  box-shadow: 0 4px 6px rgba(59, 130, 246, 0.2);
+}
+
+/* Badges de vigencia */
+.badge {
+  padding: 4px 12px;
+  border-radius: 12px;
+  font-size: 0.85rem;
+  font-weight: 600;
+  display: inline-block;
+}
+
+.badge-vigente {
+  background-color: #d1fae5;
+  color: #065f46;
+}
+
+.badge-no-vigente {
+  background-color: #fee2e2;
+  color: #991b1b;
+}
+
+.producto-no-vigente {
+  opacity: 0.6;
+  background-color: #f9fafb;
+}
+
+/* Campo requerido */
+.required {
+  color: #ef4444;
+  font-weight: bold;
+}
+
+/* Contador de caracteres */
+.char-counter {
+  font-size: 0.85rem;
+  color: #64748b;
+  text-align: right;
+  margin-top: 4px;
+}
+
+/* Selector de vigencia */
+.vigencia-selector {
+  display: flex;
+  gap: 20px;
+  margin-top: 8px;
+}
+
+.radio-option {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  cursor: pointer;
+  padding: 10px 16px;
+  border: 2px solid #e2e8f0;
+  border-radius: 8px;
+  transition: all 0.2s;
+}
+
+.radio-option:hover {
+  border-color: #3b82f6;
+  background-color: #eff6ff;
+}
+
+.radio-option input[type="radio"] {
+  cursor: pointer;
+  width: 18px;
+  height: 18px;
+}
+
+.radio-option input[type="radio"]:checked + span {
+  color: #3b82f6;
+  font-weight: 600;
+}
+
+.radio-option span {
+  font-size: 1rem;
+  color: #475569;
+}
+
+/* Textarea */
+textarea.form-control {
+  resize: vertical;
+  min-height: 80px;
+  font-family: inherit;
+}
+
+/* Validación en tiempo real */
+.form-control.ng-invalid.ng-touched {
+  border-color: #ef4444;
+}
+
+.form-control.ng-valid.ng-touched {
+  border-color: #10b981;
+}
+
+.error-message {
+  color: #ef4444;
+  font-size: 0.875rem;
+  margin-top: 4px;
+}
+
+/* Estilos del Header */
+.header-actions {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 20px;
+  padding: 0 20px;
+}
+
+.header-actions h2 {
+  margin: 0;
+  text-align: left;
+}
+
+.btn-crear {
+  padding: 12px 24px;
+  font-size: 1rem;
+  background-color: #10b981;
+  color: white;
+  border: none;
+  border-radius: 8px;
+  cursor: pointer;
+  font-weight: 500;
+  transition: all 0.2s;
+  white-space: nowrap;
+}
+
+.btn-crear:hover {
+  background-color: #059669;
+  transform: translateY(-1px);
+  box-shadow: 0 4px 6px rgba(16, 185, 129, 0.2);
+}
+
+/* Responsive */
+@media (max-width: 768px) {
+  .search-bar {
+    flex-direction: column;
+    width: 100%;
+  }
+  
+  .search-input {
+    width: 100%;
+  }
+  
+  .btn-buscar,
+  .btn-limpiar {
+    width: 100%;
+  }
+
+  .vigencia-selector {
+    flex-direction: column;
+    gap: 10px;
+  }
+
+  .radio-option {
+    width: 100%;
+  }
+
+  .header-actions {
+    flex-direction: column;
+    gap: 15px;
+  }
+
+  .header-actions h2 {
+    text-align: center;
+  }
+
+  .btn-crear {
+    width: 100%;
+  }
+}

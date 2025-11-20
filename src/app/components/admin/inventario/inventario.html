@@ -6,7 +6,34 @@
         </button>
     </div>
 
-    <div class="table-container">
+    <!-- Barra de búsqueda -->
+    <div class="search-container">
+        <div class="search-bar">
+            <input type="text" [(ngModel)]="busquedaId" placeholder="Buscar producto por ID..." class="search-input"
+                (keyup.enter)="buscarPorId()">
+            <button class="btn-buscar" (click)="buscarPorId()">
+                🔍 Buscar
+            </button>
+            <button *ngIf="busquedaActiva" class="btn-limpiar" (click)="limpiarBusqueda()">
+                ✕ Limpiar
+            </button>
+        </div>
+        <div *ngIf="busquedaActiva" class="search-info">
+            Mostrando resultados de búsqueda por ID: {{ busquedaId }}
+        </div>
+    </div>
+
+    <!-- Mensaje de sin resultados -->
+    <div *ngIf="mensajeSinResultados" class="no-results-message">
+        <div class="no-results-icon">🔍</div>
+        <h3>No se encontraron coincidencias</h3>
+        <p>No existe un producto con el ID: <strong>{{ busquedaId }}</strong></p>
+        <button class="btn-limpiar-mensaje" (click)="limpiarBusqueda()">
+            Ver todos los productos
+        </button>
+    </div>
+
+    <div class="table-container" *ngIf="!mensajeSinResultados">
         <table class="productos-table">
             <thead>
                 <tr>
@@ -16,17 +43,25 @@
                     <th>Descripción</th>
                     <th>Precio</th>
                     <th>Cantidad</th>
+                    <th>Vigencia</th>
                     <th>Acciones</th>
                 </tr>
             </thead>
             <tbody>
-                <tr *ngFor="let producto of productosDisponibles; let i = index">
+                <tr *ngFor="let producto of productosFiltrados; let i = index"
+                    [class.producto-no-vigente]="!producto.vigente">
                     <td>{{ producto.id_producto }}</td>
                     <td class="emoji-cell">{{ producto.imagen }}</td>
                     <td>{{ producto.nombre }}</td>
-                    <td>{{producto.descripcion}}</td>
+                    <td>{{ producto.descripcion }}</td>
                     <td>{{ producto.precio | currency }}</td>
                     <td>{{ producto.cantidad }}</td>
+                    <td>
+                        <span class="badge" [class.badge-vigente]="producto.vigente"
+                            [class.badge-no-vigente]="!producto.vigente">
+                            {{ producto.vigente ? 'Vigente' : 'No Vigente' }}
+                        </span>
+                    </td>
                     <td class="actions">
                         <button class="btn-editar" (click)="editarProducto(producto)">Editar</button>
                         <button class="btn-eliminar" (click)="eliminarProducto(producto.id_producto, i)">
@@ -35,8 +70,8 @@
                     </td>
                 </tr>
 
-                <tr *ngIf="productosDisponibles.length === 0 && !isLoading">
-                    <td colspan="6" class="no-products">
+                <tr *ngIf="productosFiltrados.length === 0 && !isLoading && !busquedaActiva">
+                    <td colspan="8" class="no-products">
                         No hay productos disponibles
                     </td>
                 </tr>
@@ -60,48 +95,76 @@
             <div class="modal-body">
                 <form (ngSubmit)="guardarCambios()" #editarForm="ngForm">
                     <div class="form-group">
-                        <label for="nombreEditar">Nombre:</label>
+                        <label for="nombreEditar">Nombre: <span class="required">*</span></label>
                         <input type="text" id="nombreEditar" name="nombre" [(ngModel)]="productoEditando!.nombre"
-                            required #nombreEditar="ngModel" class="form-control">
+                            required [maxlength]="MAX_NOMBRE" #nombreEditar="ngModel" class="form-control">
+                        <div class="char-counter">
+                            {{ productoEditando!.nombre?.length || 0 }}/{{ MAX_NOMBRE }}
+                        </div>
                         <div *ngIf="nombreEditar.invalid && nombreEditar.touched" class="error-message">
-                            El nombre es requerido
+                            El nombre es requerido (máximo {{ MAX_NOMBRE }} caracteres)
                         </div>
                     </div>
 
                     <div class="form-group">
-                        <label for="descripcionEditar">Descripción:</label>
-                        <input type="text" id="descripcionEditar" name="descripcion"
-                            [(ngModel)]="productoEditando!.descripcion" required #descripcionEditar="ngModel"
-                            class="form-control" placeholder="Ingresa la descripción del producto">
+                        <label for="descripcionEditar">Descripción: <span class="required">*</span></label>
+                        <textarea id="descripcionEditar" name="descripcion" [(ngModel)]="productoEditando!.descripcion"
+                            required [maxlength]="MAX_DESCRIPCION" #descripcionEditar="ngModel" class="form-control"
+                            rows="3" placeholder="Ingresa la descripción del producto"></textarea>
+                        <div class="char-counter">
+                            {{ productoEditando!.descripcion?.length || 0 }}/{{ MAX_DESCRIPCION }}
+                        </div>
                         <div *ngIf="descripcionEditar.invalid && descripcionEditar.touched" class="error-message">
-                            La descripción es requerida
+                            La descripción es requerida (máximo {{ MAX_DESCRIPCION }} caracteres)
                         </div>
                     </div>
 
                     <div class="form-group">
-                        <label for="precioEditar">Precio:</label>
-                        <input type="number" id="precioEditar" name="precio" [(ngModel)]="productoEditando!.precio"
-                            required min="0" step="0.01" #precioEditar="ngModel" class="form-control">
+                        <label for="precioEditar">Precio: <span class="required">*</span></label>
+                        <input type="number" id="precioEditar" name="precio" [ngModel]="productoEditando!.precio"
+                            (input)="onPrecioChange($event, true)" required [min]="MIN_PRECIO" [max]="MAX_CANTIDAD"
+                            step="0.01" #precioEditar="ngModel" class="form-control" placeholder="0.00">
                         <div *ngIf="precioEditar.invalid && precioEditar.touched" class="error-message">
-                            El precio debe ser mayor o igual a 0
+                            El precio debe ser entre {{ MIN_PRECIO | number:'1.2-2' }} y {{ MAX_CANTIDAD }}
+                        </div>
+                        <div class="input-hint">
+                            Rango válido: {{ MIN_PRECIO | number:'1.2-2' }} - {{ MAX_CANTIDAD }}
                         </div>
                     </div>
 
                     <div class="form-group">
-                        <label for="cantidadEditar">Cantidad:</label>
-                        <input type="number" id="cantidadEditar" name="cantidad"
-                            [(ngModel)]="productoEditando!.cantidad" required min="0" #cantidadEditar="ngModel"
-                            class="form-control">
+                        <label for="cantidadEditar">Cantidad: <span class="required">*</span></label>
+                        <input type="number" id="cantidadEditar" name="cantidad" [ngModel]="productoEditando!.cantidad"
+                            (input)="onCantidadChange($event, true)" required [min]="MIN_CANTIDAD" [max]="MAX_CANTIDAD"
+                            step="1" #cantidadEditar="ngModel" class="form-control" placeholder="0">
                         <div *ngIf="cantidadEditar.invalid && cantidadEditar.touched" class="error-message">
-                            La cantidad debe ser mayor o igual a 0
+                            La cantidad debe ser entre {{ MIN_CANTIDAD }} y {{ MAX_CANTIDAD }}
+                        </div>
+                        <div class="input-hint">
+                            Rango válido: {{ MIN_CANTIDAD }} - {{ MAX_CANTIDAD }} unidades
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <label>Vigencia: <span class="required">*</span></label>
+                        <div class="vigencia-selector">
+                            <label class="radio-option">
+                                <input type="radio" name="vigenciaEditar" [value]="true"
+                                    [(ngModel)]="productoEditando!.vigente">
+                                <span>Vigente</span>
+                            </label>
+                            <label class="radio-option">
+                                <input type="radio" name="vigenciaEditar" [value]="false"
+                                    [(ngModel)]="productoEditando!.vigente">
+                                <span>No Vigente</span>
+                            </label>
                         </div>
                     </div>
 
                     <div class="form-group">
-                        <label for="imagenEditar">Emoji:</label>
+                        <label for="imagenEditar">Emoji: <span class="required">*</span></label>
                         <div class="emoji-selector">
                             <input type="text" id="imagenEditar" name="imagen" [(ngModel)]="productoEditando!.imagen"
-                                #imagenEditar="ngModel" class="form-control emoji-input"
+                                required #imagenEditar="ngModel" class="form-control emoji-input"
                                 placeholder="Selecciona o escribe un emoji" maxlength="2">
                             <div class="emoji-preview">
                                 {{ productoEditando!.imagen || '🔨' }}
@@ -144,47 +207,78 @@
             <div class="modal-body">
                 <form (ngSubmit)="crearProducto()" #crearForm="ngForm">
                     <div class="form-group">
-                        <label for="nombreCrear">Nombre:</label>
+                        <label for="nombreCrear">Nombre: <span class="required">*</span></label>
                         <input type="text" id="nombreCrear" name="nombre" [(ngModel)]="productoNuevo.nombre" required
-                            #nombreCrear="ngModel" class="form-control" placeholder="Ingresa el nombre del producto">
+                            [maxlength]="MAX_NOMBRE" #nombreCrear="ngModel" class="form-control"
+                            placeholder="Ingresa el nombre del producto">
+                        <div class="char-counter">
+                            {{ productoNuevo.nombre?.length || 0 }}/{{ MAX_NOMBRE }}
+                        </div>
                         <div *ngIf="nombreCrear.invalid && nombreCrear.touched" class="error-message">
-                            El nombre es requerido
+                            El nombre es requerido (máximo {{ MAX_NOMBRE }} caracteres)
                         </div>
                     </div>
 
                     <div class="form-group">
-                        <label for="nombreCrear">Descripción:</label>
-                        <input type="text" id="descripcionCrear" name="descripcion"
-                            [(ngModel)]="productoNuevo.descripcion" required #descripcionCrear="ngModel"
-                            class="form-control" placeholder="Ingresa la descripción del producto">
+                        <label for="descripcionCrear">Descripción: <span class="required">*</span></label>
+                        <textarea id="descripcionCrear" name="descripcion" [(ngModel)]="productoNuevo.descripcion"
+                            required [maxlength]="MAX_DESCRIPCION" #descripcionCrear="ngModel" class="form-control"
+                            rows="3" placeholder="Ingresa la descripción del producto"></textarea>
+                        <div class="char-counter">
+                            {{ productoNuevo.descripcion?.length || 0 }}/{{ MAX_DESCRIPCION }}
+                        </div>
                         <div *ngIf="descripcionCrear.invalid && descripcionCrear.touched" class="error-message">
-                            La descripción es requerida
+                            La descripción es requerida (máximo {{ MAX_DESCRIPCION }} caracteres)
                         </div>
                     </div>
 
                     <div class="form-group">
-                        <label for="precioCrear">Precio:</label>
-                        <input type="number" id="precioCrear" name="precio" [(ngModel)]="productoNuevo.precio" required
-                            min="0" step="0.01" #precioCrear="ngModel" class="form-control" placeholder="0.00">
+                        <label for="precioCrear">Precio: <span class="required">*</span></label>
+                        <input type="number" id="precioCrear" name="precio" [ngModel]="productoNuevo.precio"
+                            (input)="onPrecioChange($event, false)" required [min]="MIN_PRECIO" [max]="MAX_CANTIDAD"
+                            step="0.01" #precioCrear="ngModel" class="form-control" placeholder="0.00">
                         <div *ngIf="precioCrear.invalid && precioCrear.touched" class="error-message">
-                            El precio debe ser mayor o igual a 0
+                            El precio debe ser entre {{ MIN_PRECIO | number:'1.2-2' }} y {{ MAX_CANTIDAD }}
+                        </div>
+                        <div class="input-hint">
+                            Rango válido: {{ MIN_PRECIO | number:'1.2-2' }} - {{ MAX_CANTIDAD }}
                         </div>
                     </div>
 
                     <div class="form-group">
-                        <label for="cantidadCrear">Cantidad:</label>
-                        <input type="number" id="cantidadCrear" name="cantidad" [(ngModel)]="productoNuevo.cantidad"
-                            required min="0" #cantidadCrear="ngModel" class="form-control" placeholder="0">
+                        <label for="cantidadCrear">Cantidad: <span class="required">*</span></label>
+                        <input type="number" id="cantidadCrear" name="cantidad" [ngModel]="productoNuevo.cantidad"
+                            (input)="onCantidadChange($event, false)" required [min]="MIN_CANTIDAD" [max]="MAX_CANTIDAD"
+                            step="1" #cantidadCrear="ngModel" class="form-control" placeholder="0">
                         <div *ngIf="cantidadCrear.invalid && cantidadCrear.touched" class="error-message">
-                            La cantidad debe ser mayor o igual a 0
+                            La cantidad debe ser entre {{ MIN_CANTIDAD }} y {{ MAX_CANTIDAD }}
+                        </div>
+                        <div class="input-hint">
+                            Rango válido: {{ MIN_CANTIDAD }} - {{ MAX_CANTIDAD }} unidades
                         </div>
                     </div>
 
                     <div class="form-group">
-                        <label for="imagenCrear">Emoji:</label>
+                        <label>Vigencia: <span class="required">*</span></label>
+                        <div class="vigencia-selector">
+                            <label class="radio-option">
+                                <input type="radio" name="vigenciaCrear" [value]="true"
+                                    [(ngModel)]="productoNuevo.vigente">
+                                <span>Vigente</span>
+                            </label>
+                            <label class="radio-option">
+                                <input type="radio" name="vigenciaCrear" [value]="false"
+                                    [(ngModel)]="productoNuevo.vigente">
+                                <span>No Vigente</span>
+                            </label>
+                        </div>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="imagenCrear">Emoji: <span class="required">*</span></label>
                         <div class="emoji-selector">
                             <input type="text" id="imagenCrear" name="imagen" [(ngModel)]="productoNuevo.imagen"
-                                #imagenCrear="ngModel" class="form-control emoji-input"
+                                required #imagenCrear="ngModel" class="form-control emoji-input"
                                 placeholder="Selecciona o escribe un emoji" maxlength="2">
                             <div class="emoji-preview">
                                 {{ productoNuevo.imagen || '🔨' }}
