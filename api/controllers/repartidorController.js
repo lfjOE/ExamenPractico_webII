@@ -14,7 +14,8 @@ export const listarRepartidores = (req, res) => {
             telefono,
             municipio,
             fecha_nacimiento as fechaNacimiento,
-            contrasena_provisional as contrasenaProvisional
+            contrasena_provisional as contrasenaProvisional,
+            activo
         FROM repartidor
         ORDER BY repartidor_id DESC
     `;
@@ -42,7 +43,8 @@ export const agregarRepartidor = (req, res) => {
             telefono,
             municipio,
             fechaNacimiento,
-            contrasenaProvisional
+            contrasenaProvisional,
+            activo = true  // Valor por defecto: true
         } = req.body || {};
 
         // Validaciones básicas
@@ -100,14 +102,15 @@ export const agregarRepartidor = (req, res) => {
                         telefono,
                         municipio,
                         fecha_nacimiento,
-                        contrasena_provisional
+                        contrasena_provisional,
+                        activo
                     )
-                    VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)
+                    VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
                 `;
 
                 db.query(
                     sqlRepartidor,
-                    [userId, nombre, apellidos, email, codigoPais || '+52', telefono, municipio, fechaNacimiento, contrasenaProvisional],
+                    [userId, nombre, apellidos, email, codigoPais || '+52', telefono, municipio, fechaNacimiento, contrasenaProvisional, activo],
                     (err, result) => {
                         if (err) {
                             console.error('[agregarRepartidor] Error al insertar repartidor:', err);
@@ -145,7 +148,8 @@ export const editarRepartidor = (req, res) => {
             telefono,
             municipio,
             fechaNacimiento,
-            contrasenaProvisional
+            contrasenaProvisional,
+            activo
         } = req.body || {};
 
         if (!id) {
@@ -162,13 +166,14 @@ export const editarRepartidor = (req, res) => {
                 telefono = ?,
                 municipio = ?,
                 fecha_nacimiento = ?,
-                contrasena_provisional = ?
+                contrasena_provisional = ?,
+                activo = ?
             WHERE repartidor_id = ?
         `;
 
         db.query(
             sql,
-            [nombre, apellidos, email, codigoPais, telefono, municipio, fechaNacimiento, contrasenaProvisional, id],
+            [nombre, apellidos, email, codigoPais, telefono, municipio, fechaNacimiento, contrasenaProvisional, activo, id],
             (err, result) => {
                 if (err) {
                     console.error('[editarRepartidor] Error actualizando:', err);
@@ -203,7 +208,7 @@ export const eliminarRepartidor = (req, res) => {
         }
 
         // Soft delete - solo marcamos como inactivo
-        const sql = 'delete from repartidor WHERE repartidor_id = ?';
+        const sql = 'update repartidor set activo = false WHERE repartidor_id = ?';
 
         db.query(sql, [id], (err, result) => {
             if (err) {

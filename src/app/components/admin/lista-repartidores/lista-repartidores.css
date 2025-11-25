@@ -43,6 +43,15 @@ h2 {
   background-color: #f8f9fa;
 }
 
+.fila-clickable {
+  cursor: pointer;
+  transition: background-color 0.2s;
+}
+
+.fila-clickable:hover {
+  background-color: #e2e8f0 !important;
+}
+
 .repartidores-table tbody tr:last-child td {
   border-bottom: none;
 }
@@ -79,6 +88,29 @@ h2 {
 
 .btn-eliminar:hover {
   background-color: #c82333;
+}
+
+/* Badges de estado */
+.badge {
+  display: inline-block;
+  padding: 6px 12px;
+  border-radius: 20px;
+  font-size: 0.85rem;
+  font-weight: 600;
+  text-align: center;
+  min-width: 80px;
+}
+
+.badge-activo {
+  background-color: #d1fae5;
+  color: #065f46;
+  border: 1px solid #10b981;
+}
+
+.badge-inactivo {
+  background-color: #fee2e2;
+  color: #991b1b;
+  border: 1px solid #ef4444;
 }
 
 /* Mensaje sin productos */

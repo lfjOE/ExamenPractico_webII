@@ -7,6 +7,7 @@ interface Repartidor {
     telefono: string,
     municipio: string,
     contrasenaProvisional: string,
-    fechaNacimiento: Date
+    fechaNacimiento: Date,
+    activo: boolean
 
 }

@@ -9,7 +9,7 @@
     <!-- Barra de búsqueda -->
     <div class="search-container">
         <div class="search-bar">
-            <input type="text" [(ngModel)]="busquedaNombre" placeholder="Buscar repartidor por nombre o apellido..."
+            <input type="text" [(ngModel)]="busquedaNombre" placeholder="Buscar por nombre, apellido o email..."
                 class="search-input" (keyup.enter)="buscarPorNombre()">
             <button class="btn-buscar" (click)="buscarPorNombre()">
                 🔍 Buscar
@@ -44,11 +44,12 @@
                     <th>Municipio</th>
                     <th>Fecha Nacimiento</th>
                     <th>Edad</th>
+                    <th>Estado</th>
                     <th>Acciones</th>
                 </tr>
             </thead>
             <tbody>
-                <tr *ngFor="let repartidor of repartidoresFiltrados; let i = index">
+                <tr *ngFor="let repartidor of repartidoresFiltrados; let i = index" (click)="editarRepartidor(repartidor)" class="fila-clickable">
                     <td>{{ repartidor.nombre }}</td>
                     <td>{{ repartidor.apellidos }}</td>
                     <td>{{ repartidor.email }}</td>
@@ -56,9 +57,13 @@
                     <td>{{ repartidor.municipio }}</td>
                     <td>{{ repartidor.fechaNacimiento | date:'dd/MM/yyyy' }}</td>
                     <td>{{ calcularEdad(repartidor.fechaNacimiento) }} años</td>
+                    <td>
+                        <span class="badge" [class.badge-activo]="repartidor.activo" [class.badge-inactivo]="!repartidor.activo">
+                            {{ repartidor.activo ? 'Activo' : 'Inactivo' }}
+                        </span>
+                    </td>
                     <td class="actions">
-                        <button class="btn-editar" (click)="editarRepartidor(repartidor)">Editar</button>
-                        <button class="btn-eliminar" (click)="eliminarRepartidor(repartidor.id, i)">
+                        <button *ngIf="repartidor.activo" class="btn-eliminar" (click)="$event.stopPropagation(); eliminarRepartidor(repartidor.id, i)">
                             Eliminar
                         </button>
                     </td>
@@ -66,7 +71,7 @@
                 </tr>
 
                 <tr *ngIf="repartidoresFiltrados.length === 0 && !isLoading && !busquedaActiva">
-                    <td colspan="8" class="no-products">
+                    <td colspan="9" class="no-products">
                         No hay repartidores disponibles
                     </td>
                 </tr>
@@ -79,11 +84,11 @@
         Cargando repartidores...
     </div>
 
-    <!-- Modal de Edición -->
+    <!-- Modal de Perfil / Edición -->
     <div *ngIf="mostrarModalEditar" class="modal-overlay" (click)="cerrarModalEditar()">
         <div class="modal-content" (click)="$event.stopPropagation()">
             <div class="modal-header">
-                <h3>Editar Repartidor</h3>
+                <h3>Perfil del Repartidor</h3>
                 <button class="btn-cerrar" (click)="cerrarModalEditar()">&times;</button>
             </div>
 
@@ -196,6 +201,19 @@
                         </div>
                         <div *ngIf="contrasenaEditar.invalid && contrasenaEditar.touched" class="error-message">
                             La contraseña no cumple con los requisitos de seguridad
+                        </div>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="activoEditar">Estado: <span class="required">*</span></label>
+                        <select id="activoEditar" name="activo"
+                            [(ngModel)]="repartidorEditando!.activo" required
+                            #activoEditar="ngModel" class="form-control">
+                            <option [ngValue]="true">Activo</option>
+                            <option [ngValue]="false">Inactivo</option>
+                        </select>
+                        <div class="input-hint">
+                            Los repartidores inactivos no podrán recibir pedidos
                         </div>
                     </div>
 
@@ -329,6 +347,19 @@
                         </div>
                         <div *ngIf="contrasenaCrear.invalid && contrasenaCrear.touched" class="error-message">
                             La contraseña no cumple con los requisitos de seguridad
+                        </div>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="activoCrear">Estado: <span class="required">*</span></label>
+                        <select id="activoCrear" name="activo"
+                            [(ngModel)]="repartidorNuevo.activo" required
+                            #activoCrear="ngModel" class="form-control">
+                            <option [ngValue]="true">Activo</option>
+                            <option [ngValue]="false">Inactivo</option>
+                        </select>
+                        <div class="input-hint">
+                            Los repartidores inactivos no podrán recibir pedidos
                         </div>
                     </div>
 

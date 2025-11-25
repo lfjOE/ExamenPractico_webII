@@ -81,7 +81,8 @@ export class ListaRepartidores {
       telefono: '',
       municipio: '',
       contrasenaProvisional: '',
-      fechaNacimiento: new Date()
+      fechaNacimiento: new Date(),
+      activo: true
     };
   }
 
@@ -217,7 +218,8 @@ export class ListaRepartidores {
     const nombreBuscado = this.busquedaNombre.trim().toLowerCase();
     const repartidoresEncontrados = this.repartidoresDisponibles.filter(
       r => r.nombre.toLowerCase().includes(nombreBuscado) ||
-        r.apellidos.toLowerCase().includes(nombreBuscado)
+        r.apellidos.toLowerCase().includes(nombreBuscado) ||
+        r.email.toLowerCase().includes(nombreBuscado)
     );
 
     if (repartidoresEncontrados.length > 0) {
