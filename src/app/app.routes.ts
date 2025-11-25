@@ -6,8 +6,8 @@ import { CarritoComponent } from './components/carrito/carrito';
 import { ResetPassword } from './components/reset-password/reset-password';
 import { TipoUsuarioGuard } from './guards/tipo-usuario-guard';
 import { AdminPanel } from './components/admin/admin-panel/admin-panel';
-import { Repatidores } from './components/admin/repatidores/repatidores';
 import { Inventario } from './components/admin/inventario/inventario';
+import { ListaRepartidores } from './components/admin/lista-repartidores/lista-repartidores';
 
 export const routes: Routes = [
     {
@@ -45,7 +45,7 @@ export const routes: Routes = [
     },
     {
         path: 'admin/repartidores',
-        component: Repatidores,
+        component: ListaRepartidores,
         canActivate: [TipoUsuarioGuard],
         data: { tipo: 'admin' },
         title: 'Gestión de Repartidores'

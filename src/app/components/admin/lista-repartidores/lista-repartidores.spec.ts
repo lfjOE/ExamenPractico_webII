@@ -1,18 +1,18 @@
 import { ComponentFixture, TestBed } from '@angular/core/testing';
 
-import { Repatidores } from './repatidores';
+import { ListaRepartidores } from './lista-repartidores';
 
-describe('Repatidores', () => {
-  let component: Repatidores;
-  let fixture: ComponentFixture<Repatidores>;
+describe('ListaRepartidores', () => {
+  let component: ListaRepartidores;
+  let fixture: ComponentFixture<ListaRepartidores>;
 
   beforeEach(async () => {
     await TestBed.configureTestingModule({
-      imports: [Repatidores]
+      imports: [ListaRepartidores]
     })
     .compileComponents();
 
-    fixture = TestBed.createComponent(Repatidores);
+    fixture = TestBed.createComponent(ListaRepartidores);
     component = fixture.componentInstance;
     fixture.detectChanges();
   });

@@ -1,0 +1,347 @@
+<div class="container">
+    <div class="header-actions">
+        <h2>🚚 Lista de Repartidores</h2>
+        <button class="btn-crear" (click)="abrirModalCrear()">
+            + Nuevo Repartidor
+        </button>
+    </div>
+
+    <!-- Barra de búsqueda -->
+    <div class="search-container">
+        <div class="search-bar">
+            <input type="text" [(ngModel)]="busquedaNombre" placeholder="Buscar repartidor por nombre o apellido..."
+                class="search-input" (keyup.enter)="buscarPorNombre()">
+            <button class="btn-buscar" (click)="buscarPorNombre()">
+                🔍 Buscar
+            </button>
+            <button *ngIf="busquedaActiva" class="btn-limpiar" (click)="limpiarBusqueda()">
+                ✕ Limpiar
+            </button>
+        </div>
+        <div *ngIf="busquedaActiva" class="search-info">
+            Mostrando resultados de búsqueda: "{{ busquedaNombre }}"
+        </div>
+    </div>
+
+    <!-- Mensaje de sin resultados -->
+    <div *ngIf="mensajeSinResultados" class="no-results-message">
+        <div class="no-results-icon">🔍</div>
+        <h3>No se encontraron coincidencias</h3>
+        <p>No existe un repartidor con el nombre: <strong>{{ busquedaNombre }}</strong></p>
+        <button class="btn-limpiar-mensaje" (click)="limpiarBusqueda()">
+            Ver todos los repartidores
+        </button>
+    </div>
+
+    <div class="table-container" *ngIf="!mensajeSinResultados">
+        <table class="repartidores-table">
+            <thead>
+                <tr>
+                    <th>Nombre</th>
+                    <th>Apellidos</th>
+                    <th>Email</th>
+                    <th>Teléfono</th>
+                    <th>Municipio</th>
+                    <th>Fecha Nacimiento</th>
+                    <th>Edad</th>
+                    <th>Acciones</th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr *ngFor="let repartidor of repartidoresFiltrados; let i = index">
+                    <td>{{ repartidor.nombre }}</td>
+                    <td>{{ repartidor.apellidos }}</td>
+                    <td>{{ repartidor.email }}</td>
+                    <td>{{ repartidor.codigoPais }} {{ repartidor.telefono }}</td>
+                    <td>{{ repartidor.municipio }}</td>
+                    <td>{{ repartidor.fechaNacimiento | date:'dd/MM/yyyy' }}</td>
+                    <td>{{ calcularEdad(repartidor.fechaNacimiento) }} años</td>
+                    <td class="actions">
+                        <button class="btn-editar" (click)="editarRepartidor(repartidor)">Editar</button>
+                        <button class="btn-eliminar" (click)="eliminarRepartidor(repartidor.id, i)">
+                            Eliminar
+                        </button>
+                    </td>
+
+                </tr>
+
+                <tr *ngIf="repartidoresFiltrados.length === 0 && !isLoading && !busquedaActiva">
+                    <td colspan="8" class="no-products">
+                        No hay repartidores disponibles
+                    </td>
+                </tr>
+            </tbody>
+        </table>
+    </div>
+
+    <!-- Loading indicator -->
+    <div *ngIf="isLoading" class="loading">
+        Cargando repartidores...
+    </div>
+
+    <!-- Modal de Edición -->
+    <div *ngIf="mostrarModalEditar" class="modal-overlay" (click)="cerrarModalEditar()">
+        <div class="modal-content" (click)="$event.stopPropagation()">
+            <div class="modal-header">
+                <h3>Editar Repartidor</h3>
+                <button class="btn-cerrar" (click)="cerrarModalEditar()">&times;</button>
+            </div>
+
+            <div class="modal-body">
+                <form (ngSubmit)="guardarCambios()" #editarForm="ngForm">
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label for="nombreEditar">Nombre: <span class="required">*</span></label>
+                            <input type="text" id="nombreEditar" name="nombre"
+                                [(ngModel)]="repartidorEditando!.nombre" required [maxlength]="MAX_NOMBRE"
+                                #nombreEditar="ngModel" class="form-control">
+                            <div class="char-counter">
+                                {{ repartidorEditando!.nombre.length || 0 }}/{{ MAX_NOMBRE }}
+                            </div>
+                            <div *ngIf="nombreEditar.invalid && nombreEditar.touched" class="error-message">
+                                El nombre es requerido (máximo {{ MAX_NOMBRE }} caracteres)
+                            </div>
+                        </div>
+
+                        <div class="form-group">
+                            <label for="apellidosEditar">Apellidos: <span class="required">*</span></label>
+                            <input type="text" id="apellidosEditar" name="apellidos"
+                                [(ngModel)]="repartidorEditando!.apellidos" required [maxlength]="MAX_APELLIDOS"
+                                #apellidosEditar="ngModel" class="form-control">
+                            <div class="char-counter">
+                                {{ repartidorEditando!.apellidos.length || 0 }}/{{ MAX_APELLIDOS }}
+                            </div>
+                            <div *ngIf="apellidosEditar.invalid && apellidosEditar.touched" class="error-message">
+                                Los apellidos son requeridos (máximo {{ MAX_APELLIDOS }} caracteres)
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="emailEditar">Email: <span class="required">*</span></label>
+                        <input type="email" id="emailEditar" name="email" [(ngModel)]="repartidorEditando!.email"
+                            required [maxlength]="MAX_EMAIL" #emailEditar="ngModel" class="form-control"
+                            placeholder="ejemplo@correo.com">
+                        <div class="char-counter">
+                            {{ repartidorEditando!.email.length || 0 }}/{{ MAX_EMAIL }}
+                        </div>
+                        <div *ngIf="emailEditar.invalid && emailEditar.touched" class="error-message">
+                            El email es requerido y debe ser válido
+                        </div>
+                    </div>
+
+                    <div class="form-row">
+                        <div class="form-group small">
+                            <label for="codigoPaisEditar">Código: <span class="required">*</span></label>
+                            <input type="text" id="codigoPaisEditar" name="codigoPais"
+                                [(ngModel)]="repartidorEditando!.codigoPais" required [maxlength]="MAX_CODIGO_PAIS"
+                                #codigoPaisEditar="ngModel" class="form-control" placeholder="+52">
+                            <div class="input-hint">
+                                Formato E.164: +1 a +999
+                            </div>
+                            <div *ngIf="codigoPaisEditar.invalid && codigoPaisEditar.touched" class="error-message">
+                                Código inválido
+                            </div>
+                        </div>
+
+                        <div class="form-group">
+                            <label for="telefonoEditar">Teléfono: <span class="required">*</span></label>
+                            <input type="tel" id="telefonoEditar" name="telefono"
+                                [(ngModel)]="repartidorEditando!.telefono" required [maxlength]="MAX_TELEFONO"
+                                #telefonoEditar="ngModel" class="form-control" placeholder="1234567890">
+                            <div *ngIf="telefonoEditar.invalid && telefonoEditar.touched" class="error-message">
+                                El teléfono debe tener 10 dígitos
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="municipioEditar">Municipio: <span class="required">*</span></label>
+                        <select id="municipioEditar" name="municipio"
+                            [(ngModel)]="repartidorEditando!.municipio" required
+                            #municipioEditar="ngModel" class="form-control">
+                            <option value="">Seleccione un municipio...</option>
+                            <option *ngFor="let municipio of municipiosJalisco" [value]="municipio">
+                                {{ municipio }}
+                            </option>
+                        </select>
+                        <div *ngIf="municipioEditar.invalid && municipioEditar.touched" class="error-message">
+                            El municipio es requerido
+                        </div>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="fechaNacimientoEditar">Fecha de Nacimiento: <span class="required">*</span></label>
+                        <input type="date" id="fechaNacimientoEditar" name="fechaNacimiento"
+                            [(ngModel)]="repartidorEditando!.fechaNacimiento" required #fechaNacimientoEditar="ngModel"
+                            class="form-control">
+                        <div class="input-hint">
+                            Edad actual: {{ calcularEdad(repartidorEditando!.fechaNacimiento) }} años (mínimo {{
+                            MIN_EDAD }})
+                        </div>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="contrasenaEditar">Contraseña Provisional: <span class="required">*</span></label>
+                        <div class="password-input-group">
+                            <input type="text" id="contrasenaEditar" name="contrasena"
+                                [(ngModel)]="repartidorEditando!.contrasenaProvisional" required
+                                #contrasenaEditar="ngModel" class="form-control" placeholder="Mín. 8 caracteres, 1 mayúscula, 1 número, 1 símbolo">
+                            <button type="button" class="btn-generar-password" (click)="generarContrasenaParaEditar()">
+                                🔑 Generar
+                            </button>
+                        </div>
+                        <div class="input-hint">
+                            Debe contener: mínimo 8 caracteres, 1 mayúscula, 1 número y 1 símbolo (!@#$%&*-_+=?)
+                        </div>
+                        <div *ngIf="contrasenaEditar.invalid && contrasenaEditar.touched" class="error-message">
+                            La contraseña no cumple con los requisitos de seguridad
+                        </div>
+                    </div>
+
+                    <div class="form-actions">
+                        <button type="button" class="btn-cancelar" (click)="cerrarModalEditar()">
+                            Cancelar
+                        </button>
+                        <button type="submit" class="btn-guardar" [disabled]="!editarForm.form.valid">
+                            Guardar Cambios
+                        </button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+
+    <!-- Modal de Crear -->
+    <div *ngIf="mostrarModalCrear" class="modal-overlay" (click)="cerrarModalCrear()">
+        <div class="modal-content" (click)="$event.stopPropagation()">
+            <div class="modal-header">
+                <h3>Crear Nuevo Repartidor</h3>
+                <button class="btn-cerrar" (click)="cerrarModalCrear()">&times;</button>
+            </div>
+
+            <div class="modal-body">
+                <form (ngSubmit)="crearRepartidor()" #crearForm="ngForm">
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label for="nombreCrear">Nombre: <span class="required">*</span></label>
+                            <input type="text" id="nombreCrear" name="nombre" [(ngModel)]="repartidorNuevo.nombre"
+                                required [maxlength]="MAX_NOMBRE" #nombreCrear="ngModel" class="form-control"
+                                placeholder="Ingresa el nombre">
+                            <div class="char-counter">
+                                {{ repartidorNuevo.nombre.length || 0 }}/{{ MAX_NOMBRE }}
+                            </div>
+                            <div *ngIf="nombreCrear.invalid && nombreCrear.touched" class="error-message">
+                                El nombre es requerido (máximo {{ MAX_NOMBRE }} caracteres)
+                            </div>
+                        </div>
+
+                        <div class="form-group">
+                            <label for="apellidosCrear">Apellidos: <span class="required">*</span></label>
+                            <input type="text" id="apellidosCrear" name="apellidos"
+                                [(ngModel)]="repartidorNuevo.apellidos" required [maxlength]="MAX_APELLIDOS"
+                                #apellidosCrear="ngModel" class="form-control" placeholder="Ingresa los apellidos">
+                            <div class="char-counter">
+                                {{ repartidorNuevo.apellidos.length || 0 }}/{{ MAX_APELLIDOS }}
+                            </div>
+                            <div *ngIf="apellidosCrear.invalid && apellidosCrear.touched" class="error-message">
+                                Los apellidos son requeridos (máximo {{ MAX_APELLIDOS }} caracteres)
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="emailCrear">Email: <span class="required">*</span></label>
+                        <input type="email" id="emailCrear" name="email" [(ngModel)]="repartidorNuevo.email" required
+                            [maxlength]="MAX_EMAIL" #emailCrear="ngModel" class="form-control"
+                            placeholder="ejemplo@correo.com">
+                        <div class="char-counter">
+                            {{ repartidorNuevo.email.length || 0 }}/{{ MAX_EMAIL }}
+                        </div>
+                        <div *ngIf="emailCrear.invalid && emailCrear.touched" class="error-message">
+                            El email es requerido y debe ser válido
+                        </div>
+                    </div>
+
+                    <div class="form-row">
+                        <div class="form-group small">
+                            <label for="codigoPaisCrear">Código: <span class="required">*</span></label>
+                            <input type="text" id="codigoPaisCrear" name="codigoPais"
+                                [(ngModel)]="repartidorNuevo.codigoPais" required [maxlength]="MAX_CODIGO_PAIS"
+                                #codigoPaisCrear="ngModel" class="form-control" placeholder="+52">
+                            <div class="input-hint">
+                                Formato E.164: +1 a +999
+                            </div>
+                            <div *ngIf="codigoPaisCrear.invalid && codigoPaisCrear.touched" class="error-message">
+                                Código inválido
+                            </div>
+                        </div>
+
+                        <div class="form-group">
+                            <label for="telefonoCrear">Teléfono: <span class="required">*</span></label>
+                            <input type="tel" id="telefonoCrear" name="telefono" [(ngModel)]="repartidorNuevo.telefono"
+                                required [maxlength]="MAX_TELEFONO" #telefonoCrear="ngModel" class="form-control"
+                                placeholder="1234567890">
+                            <div *ngIf="telefonoCrear.invalid && telefonoCrear.touched" class="error-message">
+                                El teléfono debe tener 10 dígitos
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="municipioCrear">Municipio: <span class="required">*</span></label>
+                        <select id="municipioCrear" name="municipio"
+                            [(ngModel)]="repartidorNuevo.municipio" required
+                            #municipioCrear="ngModel" class="form-control">
+                            <option value="">Seleccione un municipio...</option>
+                            <option *ngFor="let municipio of municipiosJalisco" [value]="municipio">
+                                {{ municipio }}
+                            </option>
+                        </select>
+                        <div *ngIf="municipioCrear.invalid && municipioCrear.touched" class="error-message">
+                            El municipio es requerido
+                        </div>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="fechaNacimientoCrear">Fecha de Nacimiento: <span class="required">*</span></label>
+                        <input type="date" id="fechaNacimientoCrear" name="fechaNacimiento"
+                            [(ngModel)]="repartidorNuevo.fechaNacimiento" required #fechaNacimientoCrear="ngModel"
+                            class="form-control">
+                        <div class="input-hint">
+                            Edad actual: {{ calcularEdad(repartidorNuevo.fechaNacimiento) }} años (mínimo {{ MIN_EDAD
+                            }})
+                        </div>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="contrasenaCrear">Contraseña Provisional: <span class="required">*</span></label>
+                        <div class="password-input-group">
+                            <input type="text" id="contrasenaCrear" name="contrasena"
+                                [(ngModel)]="repartidorNuevo.contrasenaProvisional" required
+                                #contrasenaCrear="ngModel" class="form-control" placeholder="Mín. 8 caracteres, 1 mayúscula, 1 número, 1 símbolo">
+                            <button type="button" class="btn-generar-password" (click)="generarContrasenaParaNuevo()">
+                                🔑 Generar
+                            </button>
+                        </div>
+                        <div class="input-hint">
+                            Debe contener: mínimo 8 caracteres, 1 mayúscula, 1 número y 1 símbolo (!@#$%&*-_+=?)
+                        </div>
+                        <div *ngIf="contrasenaCrear.invalid && contrasenaCrear.touched" class="error-message">
+                            La contraseña no cumple con los requisitos de seguridad
+                        </div>
+                    </div>
+
+                    <div class="form-actions">
+                        <button type="button" class="btn-cancelar" (click)="cerrarModalCrear()">
+                            Cancelar
+                        </button>
+                        <button type="submit" class="btn-guardar" [disabled]="!crearForm.form.valid">
+                            Crear Repartidor
+                        </button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
