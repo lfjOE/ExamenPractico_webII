@@ -3,10 +3,12 @@ import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { ListaRepartidoresService } from '../../../servicios/lista-repartidores.service';
 
+import { RouterLink } from '@angular/router';
+
 @Component({
   selector: 'app-lista-repartidores',
   standalone: true,
-  imports: [CommonModule, FormsModule],
+  imports: [CommonModule, FormsModule, RouterLink],
   templateUrl: './lista-repartidores.html',
   styleUrl: './lista-repartidores.css'
 })

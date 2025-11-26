@@ -1,14 +1,3 @@
-<div class="container">
-    <div class="header-actions">
-        <h2>Inventario de Productos</h2>
-        <button class="btn-crear" (click)="abrirModalCrear()">
-            + Nuevo Producto
-        </button>
-    </div>
-
-    <!-- Barra de búsqueda -->
-    <div class="search-container">
-        <div class="search-bar">
             <input type="text" [(ngModel)]="busquedaId" placeholder="Buscar producto por ID..." class="search-input"
                 (keyup.enter)="buscarPorId()">
             <button class="btn-buscar" (click)="buscarPorId()">

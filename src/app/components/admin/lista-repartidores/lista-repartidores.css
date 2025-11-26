@@ -505,6 +505,29 @@ textarea.form-control {
   box-shadow: 0 4px 6px rgba(16, 185, 129, 0.2);
 }
 
+.btn-volver {
+  padding: 12px 24px;
+  font-size: 1rem;
+  background-color: #6c757d;
+  color: white;
+  border: none;
+  border-radius: 8px;
+  cursor: pointer;
+  font-weight: 500;
+  transition: all 0.2s;
+  white-space: nowrap;
+  text-decoration: none;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.btn-volver:hover {
+  background-color: #5a6268;
+  transform: translateY(-1px);
+  box-shadow: 0 4px 6px rgba(108, 117, 125, 0.2);
+}
+
 /* Form Row para campos lado a lado */
 .form-row {
   display: grid;

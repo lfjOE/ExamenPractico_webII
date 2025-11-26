@@ -1,13 +1,15 @@
+
 import { Component, inject } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
+import { RouterLink } from '@angular/router';
 import { InventarioService } from '../../../servicios/inventario.service';
 import { ProductoConCantidad } from '../../../models/producto';
 
 @Component({
   selector: 'app-inventario',
   standalone: true,
-  imports: [CommonModule, FormsModule], // Asegúrate que FormsModule está aquí
+  imports: [CommonModule, FormsModule, RouterLink],
   templateUrl: './inventario.html',
   styleUrl: './inventario.css'
 })
