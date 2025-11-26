@@ -8,6 +8,8 @@ import { TipoUsuarioGuard } from './guards/tipo-usuario-guard';
 import { AdminPanel } from './components/admin/admin-panel/admin-panel';
 import { Inventario } from './components/admin/inventario/inventario';
 import { ListaRepartidores } from './components/admin/lista-repartidores/lista-repartidores';
+import { PrivacyPolicyComponent } from './components/privacy-policy/privacy-policy';
+import { TermsConditionsComponent } from './components/terms-conditions/terms-conditions';
 
 export const routes: Routes = [
     {
@@ -58,8 +60,17 @@ export const routes: Routes = [
         title: 'Gestión de Inventario'
     },
     {
+        path: 'privacy',
+        component: PrivacyPolicyComponent,
+        title: 'Aviso de Privacidad'
+    },
+    {
+        path: 'terms',
+        component: TermsConditionsComponent,
+        title: 'Términos y Condiciones'
+    },
+    {
         path: '**',
         redirectTo: ''
     }
-
 ];

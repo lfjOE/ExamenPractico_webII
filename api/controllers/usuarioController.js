@@ -295,6 +295,8 @@ export const recoverPassword = async (req, res) => {
 
           console.log('Insert password_resets response:', result);
 
+          console.log("Contrasenna de email en .env " +process.env.EMAIL_PASSWORD);
+
           // Aquí puedes continuar con el envío del correo si todo salió bien
           const transporter = nodemailer.createTransport({
             service: 'gmail',
