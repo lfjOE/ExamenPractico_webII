@@ -4,7 +4,7 @@ export interface Producto {
     precio: number;
     descripcion: string;
     imagen?: string;
-    vigente?: boolean;
+    vigente?: boolean | number;
 }
 
 export const VALIDACIONES_PRODUCTO = {

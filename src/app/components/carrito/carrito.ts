@@ -1,7 +1,7 @@
 import { Component, inject } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { CarritoService } from '../../servicios/carrito.service';
-import { Producto } from '../../models/producto';
+import { ProductoConCantidad } from '../../models/producto';
 import { NgxPayPalModule } from "ngx-paypal";
 import { Paypal } from '../paypal/paypal';
 import { FooterComponent } from '../footer/footer';
@@ -16,7 +16,7 @@ import { FooterComponent } from '../footer/footer';
 export class CarritoComponent {
   carritoService = inject(CarritoService);
 
-  productosDisponibles: Producto[] = [];
+  productosDisponibles: ProductoConCantidad[] = [];
 
   constructor() {
     this.cargarProductos();
@@ -24,6 +24,8 @@ export class CarritoComponent {
 
   async cargarProductos() {
     this.productosDisponibles = await this.carritoService.cargarProductosDesdeBD();
+
+    this.productosDisponibles = this.productosDisponibles.filter(p => p.vigente === true || p.vigente === 1);
   }
 
   quitar(id: number) {
@@ -36,8 +38,21 @@ export class CarritoComponent {
     }
   }
 
-  agregarProducto(producto: Producto) {
+  agregarProducto(producto: ProductoConCantidad) {
     this.carritoService.agregar(producto);
+  }
+
+  aumentarCantidad(id_producto: number) {
+    this.carritoService.aumentarCantidad(id_producto);
+  }
+
+  disminuirCantidad(id_producto: number) {
+    this.carritoService.disminuirCantidad(id_producto);
+  }
+
+  obtenerStockDisponible(id_producto: number): number {
+    const producto = this.productosDisponibles.find(p => p.id_producto === id_producto);
+    return producto?.cantidad || 0;
   }
 
   async procederCompra() {
@@ -53,7 +68,7 @@ export class CarritoComponent {
 
     const productos = (this.carritoService.productos() || []).map(p => ({
       id_producto: p.id_producto,
-      cantidad: 1
+      cantidad: p.cantidad || 1
     }));
 
     try {

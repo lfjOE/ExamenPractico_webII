@@ -10,8 +10,14 @@
           <h4>{{ producto.nombre }}</h4>
           <p class="descripcion">{{ producto.descripcion }}</p>
           <p class="precio">${{ producto.precio }}</p>
+         
+        <button class="btn-agregar" [disabled]="!producto.cantidad || producto.cantidad <= 0">
+          {{ (!producto.cantidad || producto.cantidad <= 0) ? 'Sin Stock' : '+ Agregar' }}
+        </button>
         </div>
-        <button class="btn-agregar">+ Agregar</button>
+        <p class="stock" [class.sin-stock]="!producto.cantidad || producto.cantidad <= 0">
+            Stock: {{ producto.cantidad || 0 }} unidades
+          </p>
       </div>
     </div>
   </div>
@@ -38,10 +44,22 @@
               <div>
                 <h4>{{ producto.nombre }}</h4>
                 <p class="descripcion">{{ producto.descripcion }}</p>
+                <p class="stock-info">Stock disponible: {{ obtenerStockDisponible(producto.id_producto!) }}</p>
               </div>
             </div>
             <div class="producto-actions">
-              <span class="precio">${{ producto.precio }}</span>
+              <div class="cantidad-controls">
+                <button (click)="disminuirCantidad(producto.id_producto!); $event.stopPropagation()" 
+                        class="btn-cantidad">
+                  −
+                </button>
+                <span class="cantidad-display">{{ producto.cantidad || 1 }}</span>
+                <button (click)="aumentarCantidad(producto.id_producto!); $event.stopPropagation()" 
+                        class="btn-cantidad">
+                  +
+                </button>
+              </div>
+              <span class="precio">${{ (producto.precio * (producto.cantidad || 1)).toFixed(2) }}</span>
               <button (click)="quitar(producto.id_producto!); $event.stopPropagation()" class="btn-quitar">
                 X
               </button>

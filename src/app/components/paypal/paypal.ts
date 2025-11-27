@@ -1,6 +1,6 @@
 import { Component, EventEmitter, Input, OnInit, Output } from '@angular/core';
 import { IPayPalConfig, ICreateOrderRequest, NgxPayPalModule } from 'ngx-paypal';
-import { Producto } from '../../models/producto';
+import { ProductoConCantidad } from '../../models/producto';
 
 @Component({
   selector: 'app-paypal',
@@ -12,14 +12,14 @@ export class Paypal implements OnInit {
   public payPalConfig?: IPayPalConfig;
 
   @Output() pagoAutorizado = new EventEmitter<void>();
-  private _productos: Producto[] = [];
+  private _productos: ProductoConCantidad[] = [];
 
   @Input()
-  set productos(value: Producto[]) {
+  set productos(value: ProductoConCantidad[]) {
     this._productos = value || [];
     this.initConfig();
   }
-  get productos(): Producto[] {
+  get productos(): ProductoConCantidad[] {
     return this._productos;
   }
 
@@ -28,7 +28,7 @@ export class Paypal implements OnInit {
   }
 
   private calcularSubtotal(): number {
-    return this.productos.reduce((sum, producto) => sum + producto.precio, 0);
+    return this.productos.reduce((sum, producto) => sum + (producto.precio * (producto.cantidad || 1)), 0);
   }
 
   private calcularIVA(): number {
@@ -46,7 +46,7 @@ export class Paypal implements OnInit {
 
     const items = this.productos.map(producto => ({
       name: producto.nombre,
-      quantity: '1',
+      quantity: String(producto.cantidad || 1),
       category: 'PHYSICAL_GOODS' as const,
       unit_amount: {
         currency_code: 'USD',
@@ -58,7 +58,7 @@ export class Paypal implements OnInit {
     this.payPalConfig = {
       currency: 'USD',
       clientId: 'AUefwwBarLq7iQFmiLlkjvEqSVC--rPRYRodTNGKDJThZVVUllOynPI9JfbJ5EZxSZsB39Gf2vfvDlsz',
-      createOrderOnClient: (data:any) => <ICreateOrderRequest>{
+      createOrderOnClient: (data: any) => <ICreateOrderRequest>{
         intent: 'CAPTURE',
         purchase_units: [
           {
@@ -83,23 +83,23 @@ export class Paypal implements OnInit {
         label: 'paypal',
         layout: 'vertical'
       },
-      onApprove: (data:any, actions:any) => {
+      onApprove: (data: any, actions: any) => {
         console.log('onApprove - transaction was approved, but not authorized', data, actions);
         actions.order.get().then((details: any) => {
           console.log('onApprove - you can get full order details inside onApprove: ', details);
         });
       },
-      onClientAuthorization: (data:any) => {
+      onClientAuthorization: (data: any) => {
         console.log('onClientAuthorization - you should probably inform your server about completed transaction at this point', data);
         this.pagoAutorizado.emit();
       },
-      onCancel: (data:any, actions:any) => {
+      onCancel: (data: any, actions: any) => {
         console.log('OnCancel', data, actions);
       },
       onError: (err: any) => {
         console.log('OnError', err);
       },
-      onClick: (data:any, actions:any) => {
+      onClick: (data: any, actions: any) => {
         console.log('onClick', data, actions);
       },
     };
