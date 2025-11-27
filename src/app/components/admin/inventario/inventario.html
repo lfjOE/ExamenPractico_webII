@@ -102,7 +102,7 @@
                         <input type="text" id="nombreEditar" name="nombre" [(ngModel)]="productoEditando!.nombre"
                             required [maxlength]="MAX_NOMBRE" #nombreEditar="ngModel" class="form-control">
                         <div class="char-counter">
-                            {{ productoEditando!.nombre?.length || 0 }}/{{ MAX_NOMBRE }}
+                            {{ productoEditando!.nombre.length || 0 }}/{{ MAX_NOMBRE }}
                         </div>
                         <div *ngIf="nombreEditar.invalid && nombreEditar.touched" class="error-message">
                             El nombre es requerido (máximo {{ MAX_NOMBRE }} caracteres)
@@ -115,7 +115,7 @@
                             required [maxlength]="MAX_DESCRIPCION" #descripcionEditar="ngModel" class="form-control"
                             rows="3" placeholder="Ingresa la descripción del producto"></textarea>
                         <div class="char-counter">
-                            {{ productoEditando!.descripcion?.length || 0 }}/{{ MAX_DESCRIPCION }}
+                            {{ productoEditando!.descripcion.length || 0 }}/{{ MAX_DESCRIPCION }}
                         </div>
                         <div *ngIf="descripcionEditar.invalid && descripcionEditar.touched" class="error-message">
                             La descripción es requerida (máximo {{ MAX_DESCRIPCION }} caracteres)
@@ -215,7 +215,7 @@
                             [maxlength]="MAX_NOMBRE" #nombreCrear="ngModel" class="form-control"
                             placeholder="Ingresa el nombre del producto">
                         <div class="char-counter">
-                            {{ productoNuevo.nombre?.length || 0 }}/{{ MAX_NOMBRE }}
+                            {{ productoNuevo.nombre.length || 0 }}/{{ MAX_NOMBRE }}
                         </div>
                         <div *ngIf="nombreCrear.invalid && nombreCrear.touched" class="error-message">
                             El nombre es requerido (máximo {{ MAX_NOMBRE }} caracteres)
@@ -228,7 +228,7 @@
                             required [maxlength]="MAX_DESCRIPCION" #descripcionCrear="ngModel" class="form-control"
                             rows="3" placeholder="Ingresa la descripción del producto"></textarea>
                         <div class="char-counter">
-                            {{ productoNuevo.descripcion?.length || 0 }}/{{ MAX_DESCRIPCION }}
+                            {{ productoNuevo.descripcion.length || 0 }}/{{ MAX_DESCRIPCION }}
                         </div>
                         <div *ngIf="descripcionCrear.invalid && descripcionCrear.touched" class="error-message">
                             La descripción es requerida (máximo {{ MAX_DESCRIPCION }} caracteres)
